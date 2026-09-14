@@ -109,26 +109,47 @@
   .status-danger{background:var(--danger-bg); color:var(--danger);}
   .status-none{background:#EDEDED; color:var(--muted);}
 
-  .doc-thumb-row{display:flex; gap:12px; align-items:center;}
-  .doc-thumb{
-    width:64px; height:64px;
-    border-radius:6px;
-    object-fit:cover;
-    border:1px solid var(--paper-line);
-    background:#fff;
-    flex:0 0 auto;
-  }
-  .doc-thumb.empty{
-    display:flex; align-items:center; justify-content:center;
-    color:var(--muted); font-size:11px; text-align:center;
-    background:#EFEAD9;
-  }
-  .doc-meta{flex:1; font-size:13.5px; color:var(--muted); line-height:1.5;}
+  .doc-meta{font-size:13.5px; color:var(--muted); line-height:1.5; margin-bottom:12px;}
   .doc-meta .field-line{display:flex; align-items:center; gap:6px;}
   .doc-meta .field-line .val{color:var(--ink); font-weight:500;}
   .pencil{
     background:none; border:none; font-size:13px; color:var(--accent);
     padding:2px 4px; cursor:pointer;
+  }
+
+  .sides-row{display:flex; gap:10px;}
+  .side-slot{flex:1; text-align:center;}
+  .side-slot .side-label{font-size:11.5px; color:var(--muted); margin-bottom:5px; font-weight:600;}
+  .side-thumb-label{display:block; cursor:pointer;}
+  .side-thumb{
+    width:100%; height:78px;
+    border-radius:6px;
+    object-fit:cover;
+    border:1px solid var(--paper-line);
+    background:#fff;
+    display:block;
+  }
+  .side-thumb.empty{
+    display:flex; align-items:center; justify-content:center;
+    color:var(--muted); font-size:11px; text-align:center;
+    background:#EFEAD9;
+    border:1px dashed var(--paper-line);
+  }
+
+  .pdf-thumb-row{display:flex; gap:12px; align-items:center;}
+  .pdf-thumb{
+    width:64px; height:64px;
+    border-radius:6px;
+    border:1px solid var(--paper-line);
+    background:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; color:var(--muted);
+    flex:0 0 auto;
+  }
+
+  .mode-switch{
+    font-size:12px; color:var(--accent); background:none; border:none;
+    padding:4px 0; margin-top:2px; text-decoration:underline;
   }
 
   .doc-actions{display:flex; gap:8px; margin-top:12px;}
@@ -175,6 +196,10 @@
   .police-modal img{width:100%; flex:1; object-fit:contain; background:#000;}
   .police-modal iframe{flex:1;}
   .police-modal .p-bottom{padding:14px 18px 26px 18px; color:#D8D8D8; font-size:13px; text-align:center;}
+  .side-toggle-btn{
+    background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25);
+    border-radius:20px; padding:8px 16px; font-size:13px; font-weight:600; margin-top:10px;
+  }
 
   /* Kosten */
   .kosten-form{
@@ -279,7 +304,10 @@
   </div>
   <img id="police-img" src="" alt="" style="display:none;">
   <iframe id="police-pdf" src="" style="display:none; width:100%; flex:1; border:none; background:#fff;"></iframe>
-  <div class="p-bottom" id="police-sub"></div>
+  <div class="p-bottom">
+    <div id="police-sub"></div>
+    <button class="side-toggle-btn" id="police-toggle" style="display:none;" onclick="wisselZijde()">Toon achterkant</button>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -287,8 +315,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 <script>
   // === Firebase config: zelfde project "wiezen-club" als de andere apps ===
-  // TODO Danny: vul hier de firebaseConfig in uit een van je bestaande index.html-bestanden
-  // (bv. Reisatlas of Woensdag-tennis) — dezelfde config werkt voor deze app.
   const firebaseConfig = {
     apiKey: "AIzaSyC399MvSiF3PWF_ZTdFr0UqaoC6Fo7WsrY",
     authDomain: "wiezen-club.firebaseapp.com",
@@ -308,10 +334,12 @@
     { key:'inschrijving', label:'Inschrijving (kenteken)' },
     { key:'keuring', label:'Keuring' },
     { key:'rijbewijs', label:'Rijbewijs' },
-    { key:'idkaart', label:'ID-kaart' }
+    { key:'idkaart', label:'ID-kaart' },
+    { key:'paspoort', label:'Paspoort' }
   ];
 
   let staat = { documenten:{}, kosten:[] };
+  let huidigeZijde = 'voor'; // voor politie-weergave toggle
 
   // ---- Tabs ----
   function wisselTab(naam){
@@ -337,6 +365,22 @@
     DOC_REF.set(staat, { merge:true });
   }
 
+  // ---- Migratie: oude documenten (enkel fotoUrl) krijgen een modus ----
+  function genormaliseerd(key){
+    const d = staat.documenten[key] || {};
+    if(!d.modus){
+      if(d.bestandType === 'application/pdf'){
+        d.modus = 'pdf';
+        d.pdfUrl = d.fotoUrl;
+      } else if(d.fotoUrl){
+        // oude losse foto wordt de voorkant
+        d.modus = 'foto';
+        d.voorUrl = d.fotoUrl;
+      }
+    }
+    return d;
+  }
+
   // ---- Status logica ----
   function statusVoor(vervaldatum){
     if(!vervaldatum) return { klasse:'status-none', tekst:'Geen datum' };
@@ -354,12 +398,16 @@
     return d.toLocaleDateString('nl-BE', { day:'2-digit', month:'2-digit', year:'numeric' });
   }
 
+  function heeftInhoud(d){
+    return !!(d.voorUrl || d.achterUrl || d.pdfUrl);
+  }
+
   // ---- Overzicht ----
   function renderOverzicht(){
     const el = document.getElementById('overzicht-lijst');
     el.innerHTML = '';
     DOC_TYPES.forEach(t=>{
-      const d = staat.documenten[t.key] || {};
+      const d = genormaliseerd(t.key);
       const s = statusVoor(d.vervaldatum);
       const kaart = document.createElement('div');
       kaart.className = 'overview-card';
@@ -372,7 +420,7 @@
           <span class="status-pill ${s.klasse}">${s.tekst}</span>
         </div>
       `;
-      if(d.fotoUrl){
+      if(heeftInhoud(d)){
         kaart.style.cursor = 'pointer';
         kaart.onclick = ()=>toonPolitie(t.key);
       } else {
@@ -387,39 +435,73 @@
     const el = document.getElementById('documenten-lijst');
     el.innerHTML = '';
     DOC_TYPES.forEach(t=>{
-      const d = staat.documenten[t.key] || {};
+      const d = genormaliseerd(t.key);
       const s = statusVoor(d.vervaldatum);
+      const modus = d.modus || 'foto';
+
       const kaart = document.createElement('div');
       kaart.className = 'doc-card';
+
+      let inhoudHtml = '';
+      if(modus === 'pdf'){
+        inhoudHtml = `
+          <div class="pdf-thumb-row">
+            <div class="pdf-thumb">${d.pdfUrl ? 'PDF' : 'geen'}</div>
+            <label class="btn" style="flex:1; text-align:center;">
+              ${d.pdfUrl ? 'Vervang PDF' : '+ PDF'}
+              <input type="file" accept="application/pdf" onchange="uploadPdf('${t.key}', this.files[0])">
+            </label>
+          </div>
+          <button class="mode-switch" onclick="wisselModus('${t.key}','foto')">Foto's gebruiken i.p.v. PDF</button>
+        `;
+      } else {
+        inhoudHtml = `
+          <div class="sides-row">
+            <div class="side-slot">
+              <div class="side-label">Voorkant</div>
+              <label class="side-thumb-label">
+                ${d.voorUrl
+                  ? `<img class="side-thumb" src="${d.voorUrl}">`
+                  : `<div class="side-thumb empty">+ foto</div>`}
+                <input type="file" accept="image/*" onchange="uploadZijde('${t.key}','voor', this.files[0])">
+              </label>
+            </div>
+            <div class="side-slot">
+              <div class="side-label">Achterkant</div>
+              <label class="side-thumb-label">
+                ${d.achterUrl
+                  ? `<img class="side-thumb" src="${d.achterUrl}">`
+                  : `<div class="side-thumb empty">+ foto</div>`}
+                <input type="file" accept="image/*" onchange="uploadZijde('${t.key}','achter', this.files[0])">
+              </label>
+            </div>
+          </div>
+          <button class="mode-switch" onclick="wisselModus('${t.key}','pdf')">PDF gebruiken i.p.v. foto's</button>
+        `;
+      }
+
       kaart.innerHTML = `
         <div class="doc-top">
           <h3>${t.label}</h3>
           <span class="status-pill ${s.klasse}">${s.tekst}</span>
         </div>
-        <div class="doc-thumb-row">
-          ${d.fotoUrl
-            ? (d.bestandType === 'application/pdf'
-                ? `<div class="doc-thumb" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);">PDF</div>`
-                : `<img class="doc-thumb" src="${d.fotoUrl}">`)
-            : `<div class="doc-thumb empty">geen foto</div>`}
-          <div class="doc-meta">
-            <div class="field-line">
-              Vervaldatum: <span class="val">${fmtDatum(d.vervaldatum)}</span>
-              <button class="pencil" onclick="wijzigVervaldatum('${t.key}')">✎</button>
-            </div>
+        <div class="doc-meta">
+          <div class="field-line">
+            Vervaldatum: <span class="val">${fmtDatum(d.vervaldatum)}</span>
+            <button class="pencil" onclick="wijzigVervaldatum('${t.key}')">✎</button>
           </div>
         </div>
-        <div class="doc-actions">
-          <label class="btn" style="flex:1; text-align:center;">
-            ${d.fotoUrl ? 'Vervang foto' : '+ Foto/PDF'}
-            <input type="file" accept="image/*,application/pdf"
-              onchange="uploadDocument('${t.key}', this.files[0])">
-          </label>
-          ${d.fotoUrl ? `<button class="btn police" onclick="toonPolitie('${t.key}')">Toon</button>` : ''}
-        </div>
+        ${inhoudHtml}
+        ${heeftInhoud(d) ? `<div class="doc-actions"><button class="btn police" onclick="toonPolitie('${t.key}')">Toon</button></div>` : ''}
       `;
       el.appendChild(kaart);
     });
+  }
+
+  function wisselModus(key, nieuweModus){
+    if(!staat.documenten[key]) staat.documenten[key] = {};
+    staat.documenten[key].modus = nieuweModus;
+    opslaan();
   }
 
   function wijzigVervaldatum(key){
@@ -431,20 +513,36 @@
     opslaan();
   }
 
-  async function uploadDocument(key, file){
+  async function uploadZijde(key, zijde, file){
     if(!file) return;
     try{
-      let uploadBestand = file;
-      if(file.type.startsWith('image/')){
-        uploadBestand = await comprimeerAfbeelding(file);
-      }
-      const pad = `autodoc/${key}/${Date.now()}_${file.name}`;
+      const gecomprimeerd = await comprimeerAfbeelding(file);
+      const pad = `autodoc/${key}/${zijde}_${Date.now()}_${file.name}`;
       const ref = storage.ref(pad);
-      await ref.put(uploadBestand);
+      await ref.put(gecomprimeerd);
       const url = await ref.getDownloadURL();
       if(!staat.documenten[key]) staat.documenten[key] = {};
-      staat.documenten[key].fotoUrl = url;
-      staat.documenten[key].bestandType = file.type;
+      staat.documenten[key].modus = 'foto';
+      if(zijde === 'voor') staat.documenten[key].voorUrl = url;
+      else staat.documenten[key].achterUrl = url;
+      staat.documenten[key].bijgewerkt = new Date().toISOString();
+      opslaan();
+    } catch(err){
+      console.error(err);
+      alert('Upload mislukt: ' + (err.code || err.message || err) + '\n\nControleer de Storage-rules in de Firebase Console.');
+    }
+  }
+
+  async function uploadPdf(key, file){
+    if(!file) return;
+    try{
+      const pad = `autodoc/${key}/pdf_${Date.now()}_${file.name}`;
+      const ref = storage.ref(pad);
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+      if(!staat.documenten[key]) staat.documenten[key] = {};
+      staat.documenten[key].modus = 'pdf';
+      staat.documenten[key].pdfUrl = url;
       staat.documenten[key].bijgewerkt = new Date().toISOString();
       opslaan();
     } catch(err){
@@ -477,25 +575,48 @@
   // ---- Politie-weergave ----
   function toonPolitie(key){
     const t = DOC_TYPES.find(x=>x.key===key);
-    const d = staat.documenten[key] || {};
-    if(!d.fotoUrl) return;
+    const d = genormaliseerd(key);
+    if(!heeftInhoud(d)) return;
+
     document.getElementById('police-title').textContent = t.label;
+    window._policeKey = key;
+
     const imgEl = document.getElementById('police-img');
     const pdfEl = document.getElementById('police-pdf');
-    if(d.bestandType === 'application/pdf'){
+    const toggleEl = document.getElementById('police-toggle');
+
+    if(d.modus === 'pdf'){
       imgEl.style.display = 'none';
       imgEl.src = '';
       pdfEl.style.display = 'block';
-      pdfEl.src = d.fotoUrl;
+      pdfEl.src = d.pdfUrl;
+      toggleEl.style.display = 'none';
     } else {
       pdfEl.style.display = 'none';
       pdfEl.src = '';
-      imgEl.style.display = 'block';
-      imgEl.src = d.fotoUrl;
+      huidigeZijde = d.voorUrl ? 'voor' : 'achter';
+      toonZijde(d);
+      toggleEl.style.display = (d.voorUrl && d.achterUrl) ? 'inline-block' : 'none';
     }
+
     document.getElementById('police-sub').textContent = 'Geldig tot ' + fmtDatum(d.vervaldatum);
     document.getElementById('police-modal').classList.add('active');
   }
+
+  function toonZijde(d){
+    const imgEl = document.getElementById('police-img');
+    const toggleEl = document.getElementById('police-toggle');
+    imgEl.style.display = 'block';
+    imgEl.src = huidigeZijde === 'voor' ? d.voorUrl : d.achterUrl;
+    toggleEl.textContent = huidigeZijde === 'voor' ? 'Toon achterkant' : 'Toon voorkant';
+  }
+
+  function wisselZijde(){
+    const d = genormaliseerd(window._policeKey);
+    huidigeZijde = huidigeZijde === 'voor' ? 'achter' : 'voor';
+    toonZijde(d);
+  }
+
   function sluitPolitie(){
     document.getElementById('police-modal').classList.remove('active');
     document.getElementById('police-pdf').src = '';
@@ -591,8 +712,11 @@
   // Expose voor inline onclick (compat SDK, geen modules)
   window.wisselTab = wisselTab;
   window.wijzigVervaldatum = wijzigVervaldatum;
-  window.uploadDocument = uploadDocument;
+  window.wisselModus = wisselModus;
+  window.uploadZijde = uploadZijde;
+  window.uploadPdf = uploadPdf;
   window.toonPolitie = toonPolitie;
+  window.wisselZijde = wisselZijde;
   window.sluitPolitie = sluitPolitie;
   window.voegKostenToe = voegKostenToe;
   window.verwijderKosten = verwijderKosten;

@@ -281,12 +281,12 @@
   // TODO Danny: vul hier de firebaseConfig in uit een van je bestaande index.html-bestanden
   // (bv. Reisatlas of Woensdag-tennis) — dezelfde config werkt voor deze app.
   const firebaseConfig = {
-    apiKey: "VUL_HIER_IN",
+    apiKey: "AIzaSyC399MvSiF3PWF_ZTdFr0UqaoC6Fo7WsrY",
     authDomain: "wiezen-club.firebaseapp.com",
     projectId: "wiezen-club",
-    storageBucket: "wiezen-club.appspot.com",
-    messagingSenderId: "VUL_HIER_IN",
-    appId: "VUL_HIER_IN"
+    storageBucket: "wiezen-club.firebasestorage.app",
+    messagingSenderId: "184449254432",
+    appId: "1:184449254432:web:e4f4f93acae57a9a736845"
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
@@ -420,18 +420,23 @@
 
   async function uploadDocument(key, file){
     if(!file) return;
-    let uploadBestand = file;
-    if(file.type.startsWith('image/')){
-      uploadBestand = await comprimeerAfbeelding(file);
+    try{
+      let uploadBestand = file;
+      if(file.type.startsWith('image/')){
+        uploadBestand = await comprimeerAfbeelding(file);
+      }
+      const pad = `autodoc/${key}/${Date.now()}_${file.name}`;
+      const ref = storage.ref(pad);
+      await ref.put(uploadBestand);
+      const url = await ref.getDownloadURL();
+      if(!staat.documenten[key]) staat.documenten[key] = {};
+      staat.documenten[key].fotoUrl = url;
+      staat.documenten[key].bijgewerkt = new Date().toISOString();
+      opslaan();
+    } catch(err){
+      console.error(err);
+      alert('Upload mislukt: ' + (err.code || err.message || err) + '\n\nControleer de Storage-rules in de Firebase Console.');
     }
-    const pad = `autodoc/${key}/${Date.now()}_${file.name}`;
-    const ref = storage.ref(pad);
-    await ref.put(uploadBestand);
-    const url = await ref.getDownloadURL();
-    if(!staat.documenten[key]) staat.documenten[key] = {};
-    staat.documenten[key].fotoUrl = url;
-    staat.documenten[key].bijgewerkt = new Date().toISOString();
-    opslaan();
   }
 
   function comprimeerAfbeelding(file){

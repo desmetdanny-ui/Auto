@@ -399,7 +399,7 @@
         <div class="doc-actions">
           <label class="btn" style="flex:1; text-align:center;">
             ${d.fotoUrl ? 'Vervang foto' : '+ Foto/PDF'}
-            <input type="file" accept="image/*,application/pdf" capture="environment"
+            <input type="file" accept="image/*,application/pdf"
               onchange="uploadDocument('${t.key}', this.files[0])">
           </label>
           ${d.fotoUrl ? `<button class="btn police" onclick="toonPolitie('${t.key}')">Toon</button>` : ''}

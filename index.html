@@ -87,6 +87,17 @@
   section.tab{display:none;}
   section.tab.active{display:block;}
 
+  .group-heading{
+    color:var(--cream-text);
+    font-size:14px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    margin:22px 2px 10px 2px;
+    font-family:'Inter',sans-serif;
+  }
+  .group-heading:first-child{margin-top:4px;}
+
   .doc-card{
     background:var(--paper);
     border:1px solid var(--paper-line);
@@ -329,14 +340,28 @@
 
   const DOC_REF = db.collection('guides').doc('autodocumenten');
 
-  const DOC_TYPES = [
-    { key:'verzekering', label:'Verzekering' },
-    { key:'inschrijving', label:'Inschrijving (kenteken)' },
-    { key:'keuring', label:'Keuring' },
-    { key:'rijbewijs', label:'Rijbewijs' },
-    { key:'idkaart', label:'ID-kaart' },
-    { key:'paspoort', label:'Paspoort' }
+  // Autodocumenten: één set voor de wagen. Persoonlijke documenten: apart per persoon.
+  const DOC_GROUPS = [
+    { titel:'Auto', docs:[
+        { key:'verzekering', label:'Verzekering' },
+        { key:'inschrijving', label:'Inschrijving (kenteken)' },
+        { key:'keuring', label:'Keuring' }
+      ]},
+    { titel:'Danny', docs:[
+        { key:'rijbewijs_danny', label:'Rijbewijs' },
+        { key:'idkaart_danny', label:'ID-kaart' },
+        { key:'paspoort_danny', label:'Paspoort' }
+      ]},
+    { titel:'Martine', docs:[
+        { key:'rijbewijs_martine', label:'Rijbewijs' },
+        { key:'idkaart_martine', label:'ID-kaart' },
+        { key:'paspoort_martine', label:'Paspoort' }
+      ]}
   ];
+
+  function alleDocTypes(){
+    return DOC_GROUPS.flatMap(g=>g.docs);
+  }
 
   let staat = { documenten:{}, kosten:[] };
   let huidigeZijde = 'voor'; // voor politie-weergave toggle
@@ -356,6 +381,7 @@
     } else {
       staat = { documenten:{}, kosten:[] };
     }
+    migreerOudeSleutels();
     renderOverzicht();
     renderDocumenten();
     renderKosten();
@@ -363,6 +389,21 @@
 
   function opslaan(){
     DOC_REF.set(staat, { merge:true });
+  }
+
+  // ---- Migratie: bestaande rijbewijs/idkaart/paspoort (zonder persoon) worden Danny's documenten ----
+  function migreerOudeSleutels(){
+    const oudNaarNieuw = { rijbewijs:'rijbewijs_danny', idkaart:'idkaart_danny', paspoort:'paspoort_danny' };
+    let gewijzigd = false;
+    Object.keys(oudNaarNieuw).forEach(oud=>{
+      const nieuw = oudNaarNieuw[oud];
+      if(staat.documenten[oud] && !staat.documenten[nieuw]){
+        staat.documenten[nieuw] = staat.documenten[oud];
+        delete staat.documenten[oud];
+        gewijzigd = true;
+      }
+    });
+    if(gewijzigd) opslaan();
   }
 
   // ---- Migratie: oude documenten (enkel fotoUrl) krijgen een modus ----
@@ -406,27 +447,34 @@
   function renderOverzicht(){
     const el = document.getElementById('overzicht-lijst');
     el.innerHTML = '';
-    DOC_TYPES.forEach(t=>{
-      const d = genormaliseerd(t.key);
-      const s = statusVoor(d.vervaldatum);
-      const kaart = document.createElement('div');
-      kaart.className = 'overview-card';
-      kaart.innerHTML = `
-        <div class="ov-left">
-          <h3>${t.label}</h3>
-          <span class="ov-sub">Vervalt: ${fmtDatum(d.vervaldatum)}</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span class="status-pill ${s.klasse}">${s.tekst}</span>
-        </div>
-      `;
-      if(heeftInhoud(d)){
-        kaart.style.cursor = 'pointer';
-        kaart.onclick = ()=>toonPolitie(t.key);
-      } else {
-        kaart.onclick = ()=>wisselTab('documenten');
-      }
-      el.appendChild(kaart);
+    DOC_GROUPS.forEach(groep=>{
+      const kop = document.createElement('div');
+      kop.className = 'group-heading';
+      kop.textContent = groep.titel;
+      el.appendChild(kop);
+
+      groep.docs.forEach(t=>{
+        const d = genormaliseerd(t.key);
+        const s = statusVoor(d.vervaldatum);
+        const kaart = document.createElement('div');
+        kaart.className = 'overview-card';
+        kaart.innerHTML = `
+          <div class="ov-left">
+            <h3>${t.label}</h3>
+            <span class="ov-sub">Vervalt: ${fmtDatum(d.vervaldatum)}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="status-pill ${s.klasse}">${s.tekst}</span>
+          </div>
+        `;
+        if(heeftInhoud(d)){
+          kaart.style.cursor = 'pointer';
+          kaart.onclick = ()=>toonPolitie(t.key);
+        } else {
+          kaart.onclick = ()=>wisselTab('documenten');
+        }
+        el.appendChild(kaart);
+      });
     });
   }
 
@@ -434,67 +482,74 @@
   function renderDocumenten(){
     const el = document.getElementById('documenten-lijst');
     el.innerHTML = '';
-    DOC_TYPES.forEach(t=>{
-      const d = genormaliseerd(t.key);
-      const s = statusVoor(d.vervaldatum);
-      const modus = d.modus || 'foto';
+    DOC_GROUPS.forEach(groep=>{
+      const kop = document.createElement('div');
+      kop.className = 'group-heading';
+      kop.textContent = groep.titel;
+      el.appendChild(kop);
 
-      const kaart = document.createElement('div');
-      kaart.className = 'doc-card';
+      groep.docs.forEach(t=>{
+        const d = genormaliseerd(t.key);
+        const s = statusVoor(d.vervaldatum);
+        const modus = d.modus || 'foto';
 
-      let inhoudHtml = '';
-      if(modus === 'pdf'){
-        inhoudHtml = `
-          <div class="pdf-thumb-row">
-            <div class="pdf-thumb">${d.pdfUrl ? 'PDF' : 'geen'}</div>
-            <label class="btn" style="flex:1; text-align:center;">
-              ${d.pdfUrl ? 'Vervang PDF' : '+ PDF'}
-              <input type="file" accept="application/pdf" onchange="uploadPdf('${t.key}', this.files[0])">
-            </label>
-          </div>
-          <button class="mode-switch" onclick="wisselModus('${t.key}','foto')">Foto's gebruiken i.p.v. PDF</button>
-        `;
-      } else {
-        inhoudHtml = `
-          <div class="sides-row">
-            <div class="side-slot">
-              <div class="side-label">Voorkant</div>
-              <label class="side-thumb-label">
-                ${d.voorUrl
-                  ? `<img class="side-thumb" src="${d.voorUrl}">`
-                  : `<div class="side-thumb empty">+ foto</div>`}
-                <input type="file" accept="image/*" onchange="uploadZijde('${t.key}','voor', this.files[0])">
+        const kaart = document.createElement('div');
+        kaart.className = 'doc-card';
+
+        let inhoudHtml = '';
+        if(modus === 'pdf'){
+          inhoudHtml = `
+            <div class="pdf-thumb-row">
+              <div class="pdf-thumb">${d.pdfUrl ? 'PDF' : 'geen'}</div>
+              <label class="btn" style="flex:1; text-align:center;">
+                ${d.pdfUrl ? 'Vervang PDF' : '+ PDF'}
+                <input type="file" accept="application/pdf" onchange="uploadPdf('${t.key}', this.files[0])">
               </label>
             </div>
-            <div class="side-slot">
-              <div class="side-label">Achterkant</div>
-              <label class="side-thumb-label">
-                ${d.achterUrl
-                  ? `<img class="side-thumb" src="${d.achterUrl}">`
-                  : `<div class="side-thumb empty">+ foto</div>`}
-                <input type="file" accept="image/*" onchange="uploadZijde('${t.key}','achter', this.files[0])">
-              </label>
+            <button class="mode-switch" onclick="wisselModus('${t.key}','foto')">Foto's gebruiken i.p.v. PDF</button>
+          `;
+        } else {
+          inhoudHtml = `
+            <div class="sides-row">
+              <div class="side-slot">
+                <div class="side-label">Voorkant</div>
+                <label class="side-thumb-label">
+                  ${d.voorUrl
+                    ? `<img class="side-thumb" src="${d.voorUrl}">`
+                    : `<div class="side-thumb empty">+ foto</div>`}
+                  <input type="file" accept="image/*" onchange="uploadZijde('${t.key}','voor', this.files[0])">
+                </label>
+              </div>
+              <div class="side-slot">
+                <div class="side-label">Achterkant</div>
+                <label class="side-thumb-label">
+                  ${d.achterUrl
+                    ? `<img class="side-thumb" src="${d.achterUrl}">`
+                    : `<div class="side-thumb empty">+ foto</div>`}
+                  <input type="file" accept="image/*" onchange="uploadZijde('${t.key}','achter', this.files[0])">
+                </label>
+              </div>
+            </div>
+            <button class="mode-switch" onclick="wisselModus('${t.key}','pdf')">PDF gebruiken i.p.v. foto's</button>
+          `;
+        }
+
+        kaart.innerHTML = `
+          <div class="doc-top">
+            <h3>${t.label}</h3>
+            <span class="status-pill ${s.klasse}">${s.tekst}</span>
+          </div>
+          <div class="doc-meta">
+            <div class="field-line">
+              Vervaldatum: <span class="val">${fmtDatum(d.vervaldatum)}</span>
+              <button class="pencil" onclick="wijzigVervaldatum('${t.key}')">✎</button>
             </div>
           </div>
-          <button class="mode-switch" onclick="wisselModus('${t.key}','pdf')">PDF gebruiken i.p.v. foto's</button>
+          ${inhoudHtml}
+          ${heeftInhoud(d) ? `<div class="doc-actions"><button class="btn police" onclick="toonPolitie('${t.key}')">Toon</button></div>` : ''}
         `;
-      }
-
-      kaart.innerHTML = `
-        <div class="doc-top">
-          <h3>${t.label}</h3>
-          <span class="status-pill ${s.klasse}">${s.tekst}</span>
-        </div>
-        <div class="doc-meta">
-          <div class="field-line">
-            Vervaldatum: <span class="val">${fmtDatum(d.vervaldatum)}</span>
-            <button class="pencil" onclick="wijzigVervaldatum('${t.key}')">✎</button>
-          </div>
-        </div>
-        ${inhoudHtml}
-        ${heeftInhoud(d) ? `<div class="doc-actions"><button class="btn police" onclick="toonPolitie('${t.key}')">Toon</button></div>` : ''}
-      `;
-      el.appendChild(kaart);
+        el.appendChild(kaart);
+      });
     });
   }
 
@@ -574,7 +629,7 @@
 
   // ---- Politie-weergave ----
   function toonPolitie(key){
-    const t = DOC_TYPES.find(x=>x.key===key);
+    const t = alleDocTypes().find(x=>x.key===key);
     const d = genormaliseerd(key);
     if(!heeftInhoud(d)) return;
 

@@ -166,6 +166,7 @@
   .police-modal .p-top h2{font-family:'Inter',sans-serif; font-size:16px; font-weight:600;}
   .police-modal .p-close{background:none; border:none; color:#fff; font-size:22px;}
   .police-modal img{width:100%; flex:1; object-fit:contain; background:#000;}
+  .police-modal iframe{flex:1;}
   .police-modal .p-bottom{padding:14px 18px 26px 18px; color:#D8D8D8; font-size:13px; text-align:center;}
 
   /* Kosten */
@@ -269,7 +270,8 @@
     <h2 id="police-title">Document</h2>
     <button class="p-close" onclick="sluitPolitie()">✕</button>
   </div>
-  <img id="police-img" src="" alt="">
+  <img id="police-img" src="" alt="" style="display:none;">
+  <iframe id="police-pdf" src="" style="display:none; width:100%; flex:1; border:none; background:#fff;"></iframe>
   <div class="p-bottom" id="police-sub"></div>
 </div>
 
@@ -387,7 +389,9 @@
         </div>
         <div class="doc-thumb-row">
           ${d.fotoUrl
-            ? `<img class="doc-thumb" src="${d.fotoUrl}">`
+            ? (d.bestandType === 'application/pdf'
+                ? `<div class="doc-thumb" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);">PDF</div>`
+                : `<img class="doc-thumb" src="${d.fotoUrl}">`)
             : `<div class="doc-thumb empty">geen foto</div>`}
           <div class="doc-meta">
             <div class="field-line">
@@ -431,6 +435,7 @@
       const url = await ref.getDownloadURL();
       if(!staat.documenten[key]) staat.documenten[key] = {};
       staat.documenten[key].fotoUrl = url;
+      staat.documenten[key].bestandType = file.type;
       staat.documenten[key].bijgewerkt = new Date().toISOString();
       opslaan();
     } catch(err){
@@ -466,12 +471,25 @@
     const d = staat.documenten[key] || {};
     if(!d.fotoUrl) return;
     document.getElementById('police-title').textContent = t.label;
-    document.getElementById('police-img').src = d.fotoUrl;
+    const imgEl = document.getElementById('police-img');
+    const pdfEl = document.getElementById('police-pdf');
+    if(d.bestandType === 'application/pdf'){
+      imgEl.style.display = 'none';
+      imgEl.src = '';
+      pdfEl.style.display = 'block';
+      pdfEl.src = d.fotoUrl;
+    } else {
+      pdfEl.style.display = 'none';
+      pdfEl.src = '';
+      imgEl.style.display = 'block';
+      imgEl.src = d.fotoUrl;
+    }
     document.getElementById('police-sub').textContent = 'Geldig tot ' + fmtDatum(d.vervaldatum);
     document.getElementById('police-modal').classList.add('active');
   }
   function sluitPolitie(){
     document.getElementById('police-modal').classList.remove('active');
+    document.getElementById('police-pdf').src = '';
   }
 
   // ---- Kosten & km ----

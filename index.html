@@ -129,9 +129,8 @@
   }
 
   .sides-row{display:flex; gap:10px;}
-  .side-slot{flex:1; text-align:center;}
-  .side-slot .side-label{font-size:11.5px; color:var(--muted); margin-bottom:5px; font-weight:600;}
-  .side-thumb-label{display:block; cursor:pointer;}
+  .side-slot{flex:1;}
+  .side-slot .side-label{font-size:11.5px; color:var(--muted); margin-bottom:5px; font-weight:600; text-align:center;}
   .side-thumb{
     width:100%; height:78px;
     border-radius:6px;
@@ -146,6 +145,19 @@
     background:#EFEAD9;
     border:1px dashed var(--paper-line);
   }
+  .side-buttons{display:flex; gap:5px; margin-top:6px;}
+  .btn-mini{
+    flex:1; text-align:center;
+    font-family:'Inter',sans-serif;
+    font-size:11.5px; font-weight:600;
+    border-radius:6px;
+    padding:6px 4px;
+    border:1px solid var(--paper-line);
+    background:#fff;
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .btn-mini.verwijder{color:var(--danger); border-color:#E7C9C3;}
 
   .pdf-thumb-row{display:flex; gap:12px; align-items:center;}
   .pdf-thumb{
@@ -157,10 +169,11 @@
     font-size:11px; color:var(--muted);
     flex:0 0 auto;
   }
+  .pdf-actions{display:flex; gap:8px; flex:1;}
 
   .mode-switch{
     font-size:12px; color:var(--accent); background:none; border:none;
-    padding:4px 0; margin-top:2px; text-decoration:underline;
+    padding:4px 0; margin-top:10px; text-decoration:underline; display:block;
   }
 
   .doc-actions{display:flex; gap:8px; margin-top:12px;}
@@ -406,17 +419,19 @@
     if(gewijzigd) opslaan();
   }
 
-  // ---- Migratie: oude documenten (enkel fotoUrl) krijgen een modus ----
+  // ---- Migratie: oude documenten (enkel fotoUrl) krijgen een modus, en meteen wegschrijven ----
   function genormaliseerd(key){
     const d = staat.documenten[key] || {};
     if(!d.modus){
       if(d.bestandType === 'application/pdf'){
         d.modus = 'pdf';
         d.pdfUrl = d.fotoUrl;
+        opslaan();
       } else if(d.fotoUrl){
         // oude losse foto wordt de voorkant
         d.modus = 'foto';
         d.voorUrl = d.fotoUrl;
+        opslaan();
       }
     }
     return d;
@@ -501,10 +516,13 @@
           inhoudHtml = `
             <div class="pdf-thumb-row">
               <div class="pdf-thumb">${d.pdfUrl ? 'PDF' : 'geen'}</div>
-              <label class="btn" style="flex:1; text-align:center;">
-                ${d.pdfUrl ? 'Vervang PDF' : '+ PDF'}
-                <input type="file" accept="application/pdf" onchange="uploadPdf('${t.key}', this.files[0])">
-              </label>
+              <div class="pdf-actions">
+                <label class="btn-mini" style="flex:1;">
+                  ${d.pdfUrl ? 'Vervang' : '+ PDF'}
+                  <input type="file" accept="application/pdf" onchange="uploadPdf('${t.key}', this.files[0])">
+                </label>
+                ${d.pdfUrl ? `<button class="btn-mini verwijder" onclick="verwijderPdf('${t.key}')">Verwijder</button>` : ''}
+              </div>
             </div>
             <button class="mode-switch" onclick="wisselModus('${t.key}','foto')">Foto's gebruiken i.p.v. PDF</button>
           `;
@@ -513,21 +531,29 @@
             <div class="sides-row">
               <div class="side-slot">
                 <div class="side-label">Voorkant</div>
-                <label class="side-thumb-label">
-                  ${d.voorUrl
-                    ? `<img class="side-thumb" src="${d.voorUrl}">`
-                    : `<div class="side-thumb empty">+ foto</div>`}
-                  <input type="file" accept="image/*" onchange="uploadZijde('${t.key}','voor', this.files[0])">
-                </label>
+                ${d.voorUrl
+                  ? `<img class="side-thumb" src="${d.voorUrl}">`
+                  : `<div class="side-thumb empty">geen foto</div>`}
+                <div class="side-buttons">
+                  <label class="btn-mini">
+                    ${d.voorUrl ? 'Vervang' : '+ Foto'}
+                    <input type="file" accept="image/*" onchange="uploadZijde('${t.key}','voor', this.files[0])">
+                  </label>
+                  ${d.voorUrl ? `<button class="btn-mini verwijder" onclick="verwijderZijde('${t.key}','voor')">Verwijder</button>` : ''}
+                </div>
               </div>
               <div class="side-slot">
                 <div class="side-label">Achterkant</div>
-                <label class="side-thumb-label">
-                  ${d.achterUrl
-                    ? `<img class="side-thumb" src="${d.achterUrl}">`
-                    : `<div class="side-thumb empty">+ foto</div>`}
-                  <input type="file" accept="image/*" onchange="uploadZijde('${t.key}','achter', this.files[0])">
-                </label>
+                ${d.achterUrl
+                  ? `<img class="side-thumb" src="${d.achterUrl}">`
+                  : `<div class="side-thumb empty">geen foto</div>`}
+                <div class="side-buttons">
+                  <label class="btn-mini">
+                    ${d.achterUrl ? 'Vervang' : '+ Foto'}
+                    <input type="file" accept="image/*" onchange="uploadZijde('${t.key}','achter', this.files[0])">
+                  </label>
+                  ${d.achterUrl ? `<button class="btn-mini verwijder" onclick="verwijderZijde('${t.key}','achter')">Verwijder</button>` : ''}
+                </div>
               </div>
             </div>
             <button class="mode-switch" onclick="wisselModus('${t.key}','pdf')">PDF gebruiken i.p.v. foto's</button>
@@ -604,6 +630,27 @@
       console.error(err);
       alert('Upload mislukt: ' + (err.code || err.message || err) + '\n\nControleer de Storage-rules in de Firebase Console.');
     }
+  }
+
+  function verwijderZijde(key, zijde){
+    if(!staat.documenten[key]) return;
+    if(!confirm('Deze foto verwijderen?')) return;
+    const veld = zijde === 'voor' ? 'voorUrl' : 'achterUrl';
+    staat.documenten[key][veld] = firebase.firestore.FieldValue.delete();
+    opslaan();
+    delete staat.documenten[key][veld];
+    renderOverzicht();
+    renderDocumenten();
+  }
+
+  function verwijderPdf(key){
+    if(!staat.documenten[key]) return;
+    if(!confirm('Deze PDF verwijderen?')) return;
+    staat.documenten[key].pdfUrl = firebase.firestore.FieldValue.delete();
+    opslaan();
+    delete staat.documenten[key].pdfUrl;
+    renderOverzicht();
+    renderDocumenten();
   }
 
   function comprimeerAfbeelding(file){
@@ -770,6 +817,8 @@
   window.wisselModus = wisselModus;
   window.uploadZijde = uploadZijde;
   window.uploadPdf = uploadPdf;
+  window.verwijderZijde = verwijderZijde;
+  window.verwijderPdf = verwijderPdf;
   window.toonPolitie = toonPolitie;
   window.wisselZijde = wisselZijde;
   window.sluitPolitie = sluitPolitie;

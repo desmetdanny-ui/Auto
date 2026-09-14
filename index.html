@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AutoDoc</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#1C2430;
+    --bg-2:#262F3D;
+    --paper:#F7F4EC;
+    --paper-line:#E4DDC9;
+    --ink:#23262B;
+    --muted:#6B7280;
+    --accent:#C08A28;
+    --ok:#3A7D44;
+    --ok-bg:#E9F1E9;
+    --warn:#B9862B;
+    --warn-bg:#FBF1DD;
+    --danger:#B23A2E;
+    --danger-bg:#FBE9E6;
+    --cream-text:#EDE7D8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:56px;
+  }
+  h1,h2,h3{font-family:'Cormorant Garamond',serif; margin:0;}
+
+  header{
+    background:linear-gradient(180deg,var(--bg) 0%,var(--bg-2) 100%);
+    color:var(--cream-text);
+    padding:22px 18px 0 18px;
+    position:sticky; top:0; z-index:20;
+  }
+  .header-row{display:flex; justify-content:space-between; align-items:flex-start;}
+  header h1{font-size:30px; font-weight:700; letter-spacing:0.3px;}
+  header p.sub{margin:4px 0 16px 0; font-size:13px; color:#B9C0CC; font-weight:400;}
+  .share-btn{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.18);
+    color:var(--cream-text);
+    border-radius:8px;
+    padding:7px 12px;
+    font-size:12.5px;
+    font-family:'Inter',sans-serif;
+  }
+
+  nav.tabs{
+    display:flex; gap:4px;
+    overflow-x:auto;
+    padding:0 12px;
+    scrollbar-width:none;
+  }
+  nav.tabs::-webkit-scrollbar{display:none;}
+  nav.tabs button{
+    flex:0 0 auto;
+    background:none;
+    border:none;
+    color:#9AA3B1;
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    padding:10px 12px 14px 12px;
+    border-bottom:2px solid transparent;
+  }
+  nav.tabs button.active{
+    color:var(--cream-text);
+    border-bottom:2px solid var(--accent);
+  }
+
+  main{padding:18px 14px 30px 14px; max-width:520px; margin:0 auto;}
+  section.tab{display:none;}
+  section.tab.active{display:block;}
+
+  .doc-card{
+    background:var(--paper);
+    border:1px solid var(--paper-line);
+    border-radius:8px;
+    padding:16px;
+    margin-bottom:14px;
+    position:relative;
+  }
+  .doc-card .doc-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+  .doc-card h3{font-size:19px; color:var(--ink);}
+  .status-pill{
+    font-family:'Inter',sans-serif;
+    font-size:11.5px;
+    font-weight:600;
+    padding:4px 9px;
+    border-radius:20px;
+  }
+  .status-ok{background:var(--ok-bg); color:var(--ok);}
+  .status-warn{background:var(--warn-bg); color:var(--warn);}
+  .status-danger{background:var(--danger-bg); color:var(--danger);}
+  .status-none{background:#EDEDED; color:var(--muted);}
+
+  .doc-thumb-row{display:flex; gap:12px; align-items:center;}
+  .doc-thumb{
+    width:64px; height:64px;
+    border-radius:6px;
+    object-fit:cover;
+    border:1px solid var(--paper-line);
+    background:#fff;
+    flex:0 0 auto;
+  }
+  .doc-thumb.empty{
+    display:flex; align-items:center; justify-content:center;
+    color:var(--muted); font-size:11px; text-align:center;
+    background:#EFEAD9;
+  }
+  .doc-meta{flex:1; font-size:13.5px; color:var(--muted); line-height:1.5;}
+  .doc-meta .field-line{display:flex; align-items:center; gap:6px;}
+  .doc-meta .field-line .val{color:var(--ink); font-weight:500;}
+  .pencil{
+    background:none; border:none; font-size:13px; color:var(--accent);
+    padding:2px 4px; cursor:pointer;
+  }
+
+  .doc-actions{display:flex; gap:8px; margin-top:12px;}
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-size:13px; font-weight:600;
+    border-radius:7px;
+    padding:9px 12px;
+    border:1px solid var(--paper-line);
+    background:#fff;
+    color:var(--ink);
+  }
+  .btn.primary{background:var(--bg); color:var(--cream-text); border:none;}
+  .btn.police{background:var(--accent); color:#fff; border:none; flex:1;}
+  input[type=file]{display:none;}
+
+  /* Overzicht */
+  .overview-card{
+    background:var(--paper);
+    border:1px solid var(--paper-line);
+    border-radius:8px;
+    padding:16px 16px;
+    margin-bottom:12px;
+    display:flex; justify-content:space-between; align-items:center;
+    gap:12px;
+  }
+  .overview-card .ov-left{display:flex; flex-direction:column; gap:4px;}
+  .overview-card h3{font-size:18px;}
+  .overview-card .ov-sub{font-size:12.5px; color:var(--muted);}
+
+  /* Politie modal */
+  .police-modal{
+    position:fixed; inset:0; background:#000;
+    display:none; z-index:100;
+    flex-direction:column;
+  }
+  .police-modal.active{display:flex;}
+  .police-modal .p-top{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 18px; color:#fff;
+  }
+  .police-modal .p-top h2{font-family:'Inter',sans-serif; font-size:16px; font-weight:600;}
+  .police-modal .p-close{background:none; border:none; color:#fff; font-size:22px;}
+  .police-modal img{width:100%; flex:1; object-fit:contain; background:#000;}
+  .police-modal .p-bottom{padding:14px 18px 26px 18px; color:#D8D8D8; font-size:13px; text-align:center;}
+
+  /* Kosten */
+  .kosten-form{
+    background:var(--paper); border:1px solid var(--paper-line); border-radius:8px;
+    padding:14px; margin-bottom:16px;
+  }
+  .kosten-form .row{display:flex; gap:8px; margin-bottom:8px;}
+  .kosten-form input, .kosten-form select{
+    flex:1; font-family:'Inter',sans-serif; font-size:14px;
+    padding:9px 10px; border:1px solid var(--paper-line); border-radius:6px;
+    background:#fff; color:var(--ink);
+  }
+  .totals{
+    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;
+  }
+  .total-chip{
+    background:var(--bg); color:var(--cream-text);
+    border-radius:20px; padding:6px 12px; font-size:12.5px; font-weight:600;
+  }
+  .total-chip.grand{background:var(--accent);}
+
+  .kosten-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:11px 4px; border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .kosten-item .ki-left{display:flex; flex-direction:column;}
+  .kosten-item .ki-type{color:var(--cream-text); font-size:14px; font-weight:600;}
+  .kosten-item .ki-sub{color:#9AA3B1; font-size:12px; margin-top:2px;}
+  .kosten-item .ki-amount{color:var(--cream-text); font-size:15px; font-weight:700;}
+  .kosten-item .ki-del{background:none; border:none; color:#8A8F98; font-size:12px; margin-left:10px;}
+
+  .empty-state{color:var(--muted); font-size:13.5px; text-align:center; padding:26px 10px;}
+
+  .sync-note{text-align:center; font-size:11px; color:#6B7280; margin-top:22px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-row">
+    <div>
+      <h1>AutoDoc</h1>
+      <p class="sub">Documenten en kosten van de auto, altijd bij de hand</p>
+    </div>
+    <button class="share-btn" onclick="deelApp()">Delen</button>
+  </div>
+  <nav class="tabs">
+    <button class="active" data-tab="overzicht" onclick="wisselTab('overzicht')">Overzicht</button>
+    <button data-tab="documenten" onclick="wisselTab('documenten')">Documenten</button>
+    <button data-tab="kosten" onclick="wisselTab('kosten')">Kosten &amp; km</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- OVERZICHT -->
+  <section class="tab active" id="tab-overzicht">
+    <div id="overzicht-lijst"></div>
+    <p class="sync-note">Tik op een document voor het volledige scherm, klaar om te tonen.</p>
+  </section>
+
+  <!-- DOCUMENTEN -->
+  <section class="tab" id="tab-documenten">
+    <div id="documenten-lijst"></div>
+  </section>
+
+  <!-- KOSTEN & KM -->
+  <section class="tab" id="tab-kosten">
+    <div class="kosten-form">
+      <div class="row">
+        <select id="k-type">
+          <option value="Brandstof">Brandstof</option>
+          <option value="Onderhoud">Onderhoud</option>
+          <option value="Verzekering">Verzekering</option>
+          <option value="Keuring">Keuring</option>
+          <option value="Belasting">Belasting</option>
+          <option value="Andere">Andere</option>
+        </select>
+        <input type="date" id="k-datum">
+      </div>
+      <div class="row">
+        <input type="number" step="0.01" id="k-bedrag" placeholder="Bedrag (€)">
+        <input type="number" id="k-km" placeholder="Kilometerstand">
+      </div>
+      <div class="row">
+        <input type="text" id="k-notitie" placeholder="Notitie (optioneel)">
+      </div>
+      <button class="btn primary" style="width:100%;" onclick="voegKostenToe()">+ Toevoegen</button>
+    </div>
+
+    <div class="totals" id="totals-rij"></div>
+    <div id="kosten-lijst"></div>
+  </section>
+
+</main>
+
+<!-- POLITIE MODAL -->
+<div class="police-modal" id="police-modal">
+  <div class="p-top">
+    <h2 id="police-title">Document</h2>
+    <button class="p-close" onclick="sluitPolitie()">✕</button>
+  </div>
+  <img id="police-img" src="" alt="">
+  <div class="p-bottom" id="police-sub"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+<script>
+  // === Firebase config: zelfde project "wiezen-club" als de andere apps ===
+  // TODO Danny: vul hier de firebaseConfig in uit een van je bestaande index.html-bestanden
+  // (bv. Reisatlas of Woensdag-tennis) — dezelfde config werkt voor deze app.
+  const firebaseConfig = {
+    apiKey: "VUL_HIER_IN",
+    authDomain: "wiezen-club.firebaseapp.com",
+    projectId: "wiezen-club",
+    storageBucket: "wiezen-club.appspot.com",
+    messagingSenderId: "VUL_HIER_IN",
+    appId: "VUL_HIER_IN"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  const DOC_REF = db.collection('guides').doc('autodocumenten');
+
+  const DOC_TYPES = [
+    { key:'verzekering', label:'Verzekering' },
+    { key:'inschrijving', label:'Inschrijving (kenteken)' },
+    { key:'keuring', label:'Keuring' }
+  ];
+
+  let staat = { documenten:{}, kosten:[] };
+
+  // ---- Tabs ----
+  function wisselTab(naam){
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===naam));
+    document.querySelectorAll('section.tab').forEach(s=>s.classList.toggle('active', s.id==='tab-'+naam));
+  }
+
+  // ---- Live sync ----
+  DOC_REF.onSnapshot(snap=>{
+    if(snap.exists){
+      const data = snap.data();
+      staat.documenten = data.documenten || {};
+      staat.kosten = data.kosten || [];
+    } else {
+      staat = { documenten:{}, kosten:[] };
+    }
+    renderOverzicht();
+    renderDocumenten();
+    renderKosten();
+  });
+
+  function opslaan(){
+    DOC_REF.set(staat, { merge:true });
+  }
+
+  // ---- Status logica ----
+  function statusVoor(vervaldatum){
+    if(!vervaldatum) return { klasse:'status-none', tekst:'Geen datum' };
+    const vandaag = new Date();
+    const dv = new Date(vervaldatum);
+    const dagenVerschil = Math.floor((dv - vandaag) / (1000*60*60*24));
+    if(dagenVerschil < 0) return { klasse:'status-danger', tekst:'Verlopen' };
+    if(dagenVerschil <= 30) return { klasse:'status-warn', tekst:`Nog ${dagenVerschil} dagen` };
+    return { klasse:'status-ok', tekst:'Geldig' };
+  }
+
+  function fmtDatum(iso){
+    if(!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('nl-BE', { day:'2-digit', month:'2-digit', year:'numeric' });
+  }
+
+  // ---- Overzicht ----
+  function renderOverzicht(){
+    const el = document.getElementById('overzicht-lijst');
+    el.innerHTML = '';
+    DOC_TYPES.forEach(t=>{
+      const d = staat.documenten[t.key] || {};
+      const s = statusVoor(d.vervaldatum);
+      const kaart = document.createElement('div');
+      kaart.className = 'overview-card';
+      kaart.innerHTML = `
+        <div class="ov-left">
+          <h3>${t.label}</h3>
+          <span class="ov-sub">Vervalt: ${fmtDatum(d.vervaldatum)}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="status-pill ${s.klasse}">${s.tekst}</span>
+        </div>
+      `;
+      if(d.fotoUrl){
+        kaart.style.cursor = 'pointer';
+        kaart.onclick = ()=>toonPolitie(t.key);
+      } else {
+        kaart.onclick = ()=>wisselTab('documenten');
+      }
+      el.appendChild(kaart);
+    });
+  }
+
+  // ---- Documenten tab ----
+  function renderDocumenten(){
+    const el = document.getElementById('documenten-lijst');
+    el.innerHTML = '';
+    DOC_TYPES.forEach(t=>{
+      const d = staat.documenten[t.key] || {};
+      const s = statusVoor(d.vervaldatum);
+      const kaart = document.createElement('div');
+      kaart.className = 'doc-card';
+      kaart.innerHTML = `
+        <div class="doc-top">
+          <h3>${t.label}</h3>
+          <span class="status-pill ${s.klasse}">${s.tekst}</span>
+        </div>
+        <div class="doc-thumb-row">
+          ${d.fotoUrl
+            ? `<img class="doc-thumb" src="${d.fotoUrl}">`
+            : `<div class="doc-thumb empty">geen foto</div>`}
+          <div class="doc-meta">
+            <div class="field-line">
+              Vervaldatum: <span class="val">${fmtDatum(d.vervaldatum)}</span>
+              <button class="pencil" onclick="wijzigVervaldatum('${t.key}')">✎</button>
+            </div>
+          </div>
+        </div>
+        <div class="doc-actions">
+          <label class="btn" style="flex:1; text-align:center;">
+            ${d.fotoUrl ? 'Vervang foto' : '+ Foto/PDF'}
+            <input type="file" accept="image/*,application/pdf" capture="environment"
+              onchange="uploadDocument('${t.key}', this.files[0])">
+          </label>
+          ${d.fotoUrl ? `<button class="btn police" onclick="toonPolitie('${t.key}')">Toon</button>` : ''}
+        </div>
+      `;
+      el.appendChild(kaart);
+    });
+  }
+
+  function wijzigVervaldatum(key){
+    const huidige = (staat.documenten[key] && staat.documenten[key].vervaldatum) || '';
+    const nieuw = prompt('Vervaldatum (jjjj-mm-dd):', huidige);
+    if(nieuw === null) return;
+    if(!staat.documenten[key]) staat.documenten[key] = {};
+    staat.documenten[key].vervaldatum = nieuw.trim();
+    opslaan();
+  }
+
+  async function uploadDocument(key, file){
+    if(!file) return;
+    let uploadBestand = file;
+    if(file.type.startsWith('image/')){
+      uploadBestand = await comprimeerAfbeelding(file);
+    }
+    const pad = `autodoc/${key}/${Date.now()}_${file.name}`;
+    const ref = storage.ref(pad);
+    await ref.put(uploadBestand);
+    const url = await ref.getDownloadURL();
+    if(!staat.documenten[key]) staat.documenten[key] = {};
+    staat.documenten[key].fotoUrl = url;
+    staat.documenten[key].bijgewerkt = new Date().toISOString();
+    opslaan();
+  }
+
+  function comprimeerAfbeelding(file){
+    return new Promise((resolve)=>{
+      const reader = new FileReader();
+      reader.onload = (e)=>{
+        const img = new Image();
+        img.onload = ()=>{
+          const maxBreedte = 1400;
+          const schaal = Math.min(1, maxBreedte / img.width);
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width * schaal;
+          canvas.height = img.height * schaal;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(blob=> resolve(blob), 'image/jpeg', 0.82);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ---- Politie-weergave ----
+  function toonPolitie(key){
+    const t = DOC_TYPES.find(x=>x.key===key);
+    const d = staat.documenten[key] || {};
+    if(!d.fotoUrl) return;
+    document.getElementById('police-title').textContent = t.label;
+    document.getElementById('police-img').src = d.fotoUrl;
+    document.getElementById('police-sub').textContent = 'Geldig tot ' + fmtDatum(d.vervaldatum);
+    document.getElementById('police-modal').classList.add('active');
+  }
+  function sluitPolitie(){
+    document.getElementById('police-modal').classList.remove('active');
+  }
+
+  // ---- Kosten & km ----
+  function voegKostenToe(){
+    const type = document.getElementById('k-type').value;
+    const datum = document.getElementById('k-datum').value || new Date().toISOString().slice(0,10);
+    const bedrag = parseFloat(document.getElementById('k-bedrag').value) || 0;
+    const km = document.getElementById('k-km').value ? parseInt(document.getElementById('k-km').value) : null;
+    const notitie = document.getElementById('k-notitie').value.trim();
+    if(bedrag <= 0 && !km){ alert('Vul minstens een bedrag of kilometerstand in.'); return; }
+
+    staat.kosten.push({
+      id: Date.now().toString(),
+      type, datum, bedrag, km, notitie
+    });
+    opslaan();
+
+    document.getElementById('k-bedrag').value = '';
+    document.getElementById('k-km').value = '';
+    document.getElementById('k-notitie').value = '';
+  }
+
+  function verwijderKosten(id){
+    staat.kosten = staat.kosten.filter(k=>k.id !== id);
+    opslaan();
+  }
+
+  function renderKosten(){
+    const totalsEl = document.getElementById('totals-rij');
+    const lijstEl = document.getElementById('kosten-lijst');
+
+    const perType = {};
+    let totaal = 0;
+    staat.kosten.forEach(k=>{
+      perType[k.type] = (perType[k.type]||0) + (k.bedrag||0);
+      totaal += (k.bedrag||0);
+    });
+
+    totalsEl.innerHTML = '';
+    Object.keys(perType).forEach(type=>{
+      const chip = document.createElement('span');
+      chip.className = 'total-chip';
+      chip.textContent = `${type}: € ${perType[type].toFixed(2)}`;
+      totalsEl.appendChild(chip);
+    });
+    if(staat.kosten.length){
+      const grand = document.createElement('span');
+      grand.className = 'total-chip grand';
+      grand.textContent = `Totaal: € ${totaal.toFixed(2)}`;
+      totalsEl.appendChild(grand);
+    }
+
+    if(!staat.kosten.length){
+      lijstEl.innerHTML = '<p class="empty-state">Nog geen kosten toegevoegd.</p>';
+      return;
+    }
+
+    const gesorteerd = [...staat.kosten].sort((a,b)=> (b.datum||'').localeCompare(a.datum||''));
+    lijstEl.innerHTML = '';
+    gesorteerd.forEach(k=>{
+      const item = document.createElement('div');
+      item.className = 'kosten-item';
+      const subDelen = [fmtDatum(k.datum)];
+      if(k.km) subDelen.push(`${k.km} km`);
+      if(k.notitie) subDelen.push(k.notitie);
+      item.innerHTML = `
+        <div class="ki-left">
+          <span class="ki-type">${k.type}</span>
+          <span class="ki-sub">${subDelen.join(' · ')}</span>
+        </div>
+        <div style="display:flex; align-items:center;">
+          <span class="ki-amount">${k.bedrag ? '€ ' + k.bedrag.toFixed(2) : '—'}</span>
+          <button class="ki-del" onclick="verwijderKosten('${k.id}')">Verwijder</button>
+        </div>
+      `;
+      lijstEl.appendChild(item);
+    });
+  }
+
+  // ---- Delen ----
+  function deelApp(){
+    if(navigator.share){
+      navigator.share({ title:'AutoDoc', url: window.location.href });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link gekopieerd.');
+    }
+  }
+
+  // Expose voor inline onclick (compat SDK, geen modules)
+  window.wisselTab = wisselTab;
+  window.wijzigVervaldatum = wijzigVervaldatum;
+  window.uploadDocument = uploadDocument;
+  window.toonPolitie = toonPolitie;
+  window.sluitPolitie = sluitPolitie;
+  window.voegKostenToe = voegKostenToe;
+  window.verwijderKosten = verwijderKosten;
+  window.deelApp = deelApp;
+</script>
+</body>
+</html>

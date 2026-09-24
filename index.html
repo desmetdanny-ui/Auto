@@ -186,6 +186,10 @@
         <strong>Izimi, de documentenkluis</strong>
         <span>Tik daarna op Open. Inloggen met itsme.</span>
       </a>
+      <a class="link-btn" href="https://my.axa.be" target="_blank" rel="noopener">
+        <strong>MyAXA, verzekeringen</strong>
+        <span>Auto- en woningverzekering. Makelaar: Groep Kerremans.</span>
+      </a>
       <a class="link-btn" href="https://www.myminfin.be" target="_blank" rel="noopener">
         <strong>MyMinfin, belastingen</strong>
         <span>Inloggen met itsme. Aanslagbiljetten en aangiftes.</span>
@@ -272,7 +276,9 @@
   const CATS = [
     { key:'woning', label:'Woning', items:[
       ['huurcontract','Huurcontract'], ['plaatsbeschrijving','Plaatsbeschrijving'],
-      ['huurwaarborg','Huurwaarborg'], ['brandverzekering','Brandverzekering'],
+      ['huurwaarborg','Huurwaarborg'], ['brandverzekering','Brandverzekering', [
+        ['MyAXA', 'Woningverzekering online bekijken', 'https://my.axa.be']
+      ]],
       ['reglement','Reglement van het gebouw'] ]},
     { key:'persoonlijk', label:'Persoonlijk', items:[
       ['zorgvolmacht','Zorgvolmacht'], ['paspoort','Paspoort'],
@@ -282,7 +288,9 @@
         ['BNP Paribas Fortis', 'Easy Banking App', 'https://apps.apple.com/be/app/easy-banking-app/id516502006'],
         ['KBC', 'KBC Mobile', 'https://apps.apple.com/be/app/kbc-mobile/id458066754'],
         ['MeDirect', 'MeDirect-app', 'https://apps.apple.com/be/app/medirect/id1444845440']
-      ]], ['pensioen','Pensioen'], ['belastingen','Belastingen'],
+      ]], ['pensioen','Pensioen', [
+        ['mypension.be', 'Website van de Pensioendienst, inloggen met itsme', 'https://www.mypension.be']
+      ]], ['belastingen','Belastingen'],
       ['hospitalisatie','Hospitalisatieverzekering'], ['levensverzekering','Levensverzekering'] ]},
     { key:'abonnementen', label:'Abonnementen', items:[
       ['energie','Energie'], ['telecom','Internet, tv en gsm'], ['water','Water'] ]},
@@ -503,7 +511,7 @@
       if(it.links && it.links.length){
         inhoud += `<div style="margin-top:10px;">` + it.links.map(([naam,app,url])=>`
           <a class="link-btn" href="${url}" target="_blank" rel="noopener">
-            <strong>${esc(naam)}</strong><span>${esc(app)}. Tik daarna op Open.</span>
+            <strong>${esc(naam)}</strong><span>${esc(app)}${url.includes('apps.apple.com') ? '. Tik daarna op Open.' : ''}</span>
           </a>`).join('') + `</div>`;
       }
       return `

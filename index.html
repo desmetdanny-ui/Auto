@@ -15,292 +15,202 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#1C2430;
-    --bg-2:#262F3D;
-    --paper:#F7F4EC;
-    --paper-line:#E4DDC9;
-    --ink:#23262B;
-    --muted:#6B7280;
-    --accent:#C08A28;
-    --ok:#3A7D44;
-    --ok-bg:#E9F1E9;
-    --warn:#B9862B;
-    --warn-bg:#FBF1DD;
-    --danger:#B23A2E;
-    --danger-bg:#FBE9E6;
+    --bg:#1C2430; --bg-2:#262F3D;
+    --paper:#F7F4EC; --paper-line:#E4DDC9;
+    --ink:#23262B; --muted:#6B7280; --accent:#C08A28;
+    --ok:#3A7D44; --ok-bg:#E9F1E9;
+    --warn:#B9862B; --warn-bg:#FBF1DD;
+    --danger:#B23A2E; --danger-bg:#FBE9E6;
     --cream-text:#EDE7D8;
   }
   *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    -webkit-font-smoothing:antialiased;
-    padding-bottom:56px;
-  }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased; padding-bottom:56px;}
   h1,h2,h3{font-family:'Cormorant Garamond',serif; margin:0;}
+  a{color:inherit;}
 
-  header{
-    background:linear-gradient(180deg,var(--bg) 0%,var(--bg-2) 100%);
-    color:var(--cream-text);
-    padding:22px 18px 0 18px;
-    position:sticky; top:0; z-index:20;
-  }
+  header{background:linear-gradient(180deg,var(--bg) 0%,var(--bg-2) 100%); color:var(--cream-text); padding:22px 18px 0 18px; position:sticky; top:0; z-index:20;}
   .header-row{display:flex; justify-content:space-between; align-items:flex-start;}
   header h1{font-size:30px; font-weight:700; letter-spacing:0.3px;}
-  header p.sub{margin:4px 0 16px 0; font-size:13px; color:#B9C0CC; font-weight:400;}
-  .share-btn{
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.18);
-    color:var(--cream-text);
-    border-radius:8px;
-    padding:7px 12px;
-    font-size:12.5px;
-    font-family:'Inter',sans-serif;
-  }
+  header p.sub{margin:4px 0 16px 0; font-size:13px; color:#B9C0CC;}
+  .share-btn{background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:var(--cream-text); border-radius:8px; padding:7px 12px; font-size:12.5px; font-family:'Inter',sans-serif;}
 
-  nav.tabs{
-    display:flex; gap:4px;
-    overflow-x:auto;
-    padding:0 12px;
-    scrollbar-width:none;
-  }
+  nav.tabs{display:flex; gap:4px; overflow-x:auto; padding:0 12px; scrollbar-width:none;}
   nav.tabs::-webkit-scrollbar{display:none;}
-  nav.tabs button{
-    flex:0 0 auto;
-    background:none;
-    border:none;
-    color:#9AA3B1;
-    font-family:'Inter',sans-serif;
-    font-size:14.5px;
-    font-weight:600;
-    padding:10px 12px 14px 12px;
-    border-bottom:2px solid transparent;
-  }
-  nav.tabs button.active{
-    color:var(--cream-text);
-    border-bottom:2px solid var(--accent);
-  }
+  nav.tabs button{flex:0 0 auto; background:none; border:none; color:#9AA3B1; font-family:'Inter',sans-serif; font-size:14.5px; font-weight:600; padding:10px 12px 14px 12px; border-bottom:2px solid transparent;}
+  nav.tabs button.active{color:var(--cream-text); border-bottom:2px solid var(--accent);}
 
   main{padding:18px 14px 30px 14px; max-width:520px; margin:0 auto;}
   section.tab{display:none;}
   section.tab.active{display:block;}
 
-  .group-heading{
-    color:var(--cream-text);
-    font-size:14px;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:0.06em;
-    margin:22px 2px 10px 2px;
-    font-family:'Inter',sans-serif;
-  }
-  .group-heading:first-child{margin-top:4px;}
-
-  .doc-card{
-    background:var(--paper);
-    border:1px solid var(--paper-line);
-    border-radius:8px;
-    padding:16px;
-    margin-bottom:14px;
-    position:relative;
-  }
-  .doc-card .doc-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
-  .doc-card h3{font-size:19px; color:var(--ink);}
-  .status-pill{
-    font-family:'Inter',sans-serif;
-    font-size:11.5px;
-    font-weight:600;
-    padding:4px 9px;
-    border-radius:20px;
-  }
+  .doc-card{background:var(--paper); border:1px solid var(--paper-line); border-radius:8px; padding:16px; margin-bottom:14px;}
+  .doc-card .doc-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:10px;}
+  .doc-card h3{font-size:21px; color:var(--ink);}
+  .status-pill{font-size:11.5px; font-weight:600; padding:4px 9px; border-radius:20px; white-space:nowrap;}
   .status-ok{background:var(--ok-bg); color:var(--ok);}
   .status-warn{background:var(--warn-bg); color:var(--warn);}
   .status-danger{background:var(--danger-bg); color:var(--danger);}
   .status-none{background:#EDEDED; color:var(--muted);}
 
-  .doc-meta{font-size:13.5px; color:var(--muted); line-height:1.5; margin-bottom:12px;}
+  .info{margin:0 0 8px 0; font-size:15px; line-height:1.45; color:var(--ink);}
+  .info .lbl{display:block; font-size:12px; color:var(--muted); font-weight:600; margin-bottom:1px;}
+  .info a{color:var(--bg); font-weight:600;}
+  .notitie{margin:0 0 8px 0; font-size:14.5px; line-height:1.5; white-space:pre-line; color:var(--ink);}
+  .leeg{margin:0; font-size:14px; color:var(--muted);}
+
+  .doc-thumb-row{display:flex; gap:12px; align-items:center;}
+  .doc-thumb{width:64px; height:64px; border-radius:6px; object-fit:cover; border:1px solid var(--paper-line); background:#fff; flex:0 0 auto;}
+  .doc-thumb.empty{display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:11px; text-align:center; background:#EFEAD9;}
+  .doc-meta{flex:1; font-size:13.5px; color:var(--muted); line-height:1.5;}
   .doc-meta .field-line{display:flex; align-items:center; gap:6px;}
   .doc-meta .field-line .val{color:var(--ink); font-weight:500;}
-  .pencil{
-    background:none; border:none; font-size:13px; color:var(--accent);
-    padding:2px 4px; cursor:pointer;
-  }
-
-  .sides-row{display:flex; gap:10px;}
-  .side-slot{flex:1;}
-  .side-slot .side-label{font-size:11.5px; color:var(--muted); margin-bottom:5px; font-weight:600; text-align:center;}
-  .side-thumb{
-    width:100%; height:78px;
-    border-radius:6px;
-    object-fit:cover;
-    border:1px solid var(--paper-line);
-    background:#fff;
-    display:block;
-  }
-  .side-thumb.empty{
-    display:flex; align-items:center; justify-content:center;
-    color:var(--muted); font-size:11px; text-align:center;
-    background:#EFEAD9;
-    border:1px dashed var(--paper-line);
-  }
-  .side-buttons{display:flex; gap:5px; margin-top:6px;}
-  .btn-mini{
-    flex:1; text-align:center;
-    font-family:'Inter',sans-serif;
-    font-size:11.5px; font-weight:600;
-    border-radius:6px;
-    padding:6px 4px;
-    border:1px solid var(--paper-line);
-    background:#fff;
-    color:var(--ink);
-    cursor:pointer;
-  }
-  .btn-mini.verwijder{color:var(--danger); border-color:#E7C9C3;}
-
-  .pdf-thumb-row{display:flex; gap:12px; align-items:center;}
-  .pdf-thumb{
-    width:64px; height:64px;
-    border-radius:6px;
-    border:1px solid var(--paper-line);
-    background:#fff;
-    display:flex; align-items:center; justify-content:center;
-    font-size:11px; color:var(--muted);
-    flex:0 0 auto;
-  }
-  .pdf-actions{display:flex; gap:8px; flex:1;}
-
-  .mode-switch{
-    font-size:12px; color:var(--accent); background:none; border:none;
-    padding:4px 0; margin-top:10px; text-decoration:underline; display:block;
-  }
+  .pencil{background:none; border:none; font-size:13px; color:var(--accent); padding:2px 4px; cursor:pointer;}
 
   .doc-actions{display:flex; gap:8px; margin-top:12px;}
-  .btn{
-    font-family:'Inter',sans-serif;
-    font-size:13px; font-weight:600;
-    border-radius:7px;
-    padding:9px 12px;
-    border:1px solid var(--paper-line);
-    background:#fff;
-    color:var(--ink);
-  }
+  .btn{font-family:'Inter',sans-serif; font-size:14px; font-weight:600; border-radius:7px; padding:10px 12px; border:1px solid var(--paper-line); background:#fff; color:var(--ink); text-align:center; text-decoration:none; display:inline-block;}
   .btn.primary{background:var(--bg); color:var(--cream-text); border:none;}
   .btn.police{background:var(--accent); color:#fff; border:none; flex:1;}
+  .btn.grow{flex:1;}
+  .btn.danger{color:var(--danger); border-color:var(--danger-bg);}
   input[type=file]{display:none;}
 
-  /* Overzicht */
-  .overview-card{
-    background:var(--paper);
-    border:1px solid var(--paper-line);
-    border-radius:8px;
-    padding:16px 16px;
-    margin-bottom:12px;
-    display:flex; justify-content:space-between; align-items:center;
-    gap:12px;
-  }
-  .overview-card .ov-left{display:flex; flex-direction:column; gap:4px;}
-  .overview-card h3{font-size:18px;}
-  .overview-card .ov-sub{font-size:12.5px; color:var(--muted);}
+  .add-btn{width:100%; background:none; border:1px dashed rgba(237,231,216,0.35); color:var(--cream-text); border-radius:8px; padding:13px; font-family:'Inter',sans-serif; font-size:14px; font-weight:600;}
 
-  /* Politie modal */
-  .police-modal{
-    position:fixed; inset:0; background:#000;
-    display:none; z-index:100;
-    flex-direction:column;
-  }
+  /* Start */
+  .contact-row{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--paper-line);}
+  .contact-row:last-child{border-bottom:none;}
+  .contact-row .c-naam{font-size:16px; font-weight:600;}
+  .contact-row .c-rol{font-size:13px; color:var(--muted);}
+  .bel-btn{background:var(--ok); color:#fff; text-decoration:none; border-radius:7px; padding:9px 14px; font-weight:600; font-size:14px; white-space:nowrap;}
+  .link-btn{display:block; background:#fff; border:1px solid var(--paper-line); border-radius:8px; padding:13px 14px; margin-bottom:8px; text-decoration:none; color:var(--ink);}
+  .link-btn strong{display:block; font-size:15.5px;}
+  .link-btn span{font-size:13px; color:var(--muted);}
+  .klein-link{display:block; margin:18px auto 0; background:none; border:none; color:#9AA3B1; font-size:12.5px; text-decoration:underline; font-family:'Inter',sans-serif;}
+
+  /* Viewer */
+  .police-modal{position:fixed; inset:0; background:#000; display:none; z-index:100; flex-direction:column;}
   .police-modal.active{display:flex;}
-  .police-modal .p-top{
-    display:flex; justify-content:space-between; align-items:center;
-    padding:16px 18px; color:#fff;
-  }
+  .police-modal .p-top{display:flex; justify-content:space-between; align-items:center; padding:16px 18px; color:#fff;}
   .police-modal .p-top h2{font-family:'Inter',sans-serif; font-size:16px; font-weight:600;}
   .police-modal .p-close{background:none; border:none; color:#fff; font-size:22px;}
-  .police-modal img{width:100%; flex:1; object-fit:contain; background:#000;}
-  .police-modal iframe{flex:1;}
+  .police-modal img{width:100%; flex:1; object-fit:contain; background:#000; min-height:0;}
   .police-modal .p-bottom{padding:14px 18px 26px 18px; color:#D8D8D8; font-size:13px; text-align:center;}
-  .side-toggle-btn{
-    background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25);
-    border-radius:20px; padding:8px 16px; font-size:13px; font-weight:600; margin-top:10px;
-  }
+
+  /* Bewerkvenster */
+  .sheet{position:fixed; inset:0; background:rgba(10,14,20,0.6); display:none; z-index:90; align-items:flex-end; justify-content:center;}
+  .sheet.active{display:flex;}
+  .sheet-body{background:var(--paper); width:100%; max-width:520px; max-height:90vh; overflow-y:auto; border-radius:14px 14px 0 0; padding:20px 16px 30px;}
+  .sheet-body h2{font-size:24px; margin-bottom:14px;}
+  .veld{margin-bottom:12px;}
+  .veld label{display:block; font-size:12.5px; font-weight:600; color:var(--muted); margin-bottom:4px;}
+  .veld input, .veld textarea, .kosten-form input, .kosten-form select{width:100%; font-family:'Inter',sans-serif; font-size:15px; padding:10px; border:1px solid var(--paper-line); border-radius:6px; background:#fff; color:var(--ink);}
+  .veld textarea{min-height:110px; resize:vertical;}
+  .hint{font-size:12.5px; color:var(--muted); line-height:1.45; margin:6px 0 14px;}
+  .sheet-acties{display:flex; gap:8px; margin-top:16px;}
+  .contact-edit{border:1px solid var(--paper-line); border-radius:8px; padding:10px; margin-bottom:10px; background:#fff;}
+  .contact-edit input{margin-bottom:6px;}
+
+  /* Pincode */
+  .pin{position:fixed; inset:0; background:var(--bg); z-index:200; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--cream-text); padding:20px;}
+  .pin.verborgen{display:none;}
+  .pin h2{font-size:30px; margin-bottom:6px; text-align:center;}
+  .pin p{font-size:14px; color:#B9C0CC; margin:0 0 22px; text-align:center; min-height:20px;}
+  .pin-dots{display:flex; gap:14px; margin-bottom:30px;}
+  .pin-dots span{width:16px; height:16px; border-radius:50%; border:2px solid var(--cream-text);}
+  .pin-dots span.vol{background:var(--cream-text);}
+  .pin-dots.fout{animation:schud .35s;}
+  @keyframes schud{25%{transform:translateX(-8px);}75%{transform:translateX(8px);}}
+  .keypad{display:grid; grid-template-columns:repeat(3,76px); gap:14px;}
+  .keypad button{height:76px; border-radius:50%; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.06); color:var(--cream-text); font-size:26px; font-family:'Inter',sans-serif;}
+  .keypad button.leeg-knop{background:none; border:none;}
+  .keypad button.wis{font-size:15px;}
+  @media (prefers-reduced-motion:reduce){.pin-dots.fout{animation:none;}}
 
   /* Kosten */
-  .kosten-form{
-    background:var(--paper); border:1px solid var(--paper-line); border-radius:8px;
-    padding:14px; margin-bottom:16px;
-  }
+  .kosten-form{background:var(--paper); border:1px solid var(--paper-line); border-radius:8px; padding:14px; margin-bottom:16px;}
   .kosten-form .row{display:flex; gap:8px; margin-bottom:8px;}
-  .kosten-form input, .kosten-form select{
-    flex:1; font-family:'Inter',sans-serif; font-size:14px;
-    padding:9px 10px; border:1px solid var(--paper-line); border-radius:6px;
-    background:#fff; color:var(--ink);
-  }
-  .totals{
-    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;
-  }
-  .total-chip{
-    background:var(--bg); color:var(--cream-text);
-    border-radius:20px; padding:6px 12px; font-size:12.5px; font-weight:600;
-  }
+  .kosten-form .row > *{flex:1;}
+  .totals{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
+  .total-chip{background:var(--bg-2); color:var(--cream-text); border-radius:20px; padding:6px 12px; font-size:12.5px; font-weight:600;}
   .total-chip.grand{background:var(--accent);}
-
-  .kosten-item{
-    display:flex; justify-content:space-between; align-items:center;
-    padding:11px 4px; border-bottom:1px solid rgba(255,255,255,0.08);
-  }
+  .kosten-item{display:flex; justify-content:space-between; align-items:center; padding:11px 4px; border-bottom:1px solid rgba(255,255,255,0.08);}
   .kosten-item .ki-left{display:flex; flex-direction:column;}
   .kosten-item .ki-type{color:var(--cream-text); font-size:14px; font-weight:600;}
   .kosten-item .ki-sub{color:#9AA3B1; font-size:12px; margin-top:2px;}
   .kosten-item .ki-amount{color:var(--cream-text); font-size:15px; font-weight:700;}
   .kosten-item .ki-del{background:none; border:none; color:#8A8F98; font-size:12px; margin-left:10px;}
-
-  .empty-state{color:var(--muted); font-size:13.5px; text-align:center; padding:26px 10px;}
-
-  .sync-note{text-align:center; font-size:11px; color:#6B7280; margin-top:22px;}
+  .empty-state{color:#9AA3B1; font-size:13.5px; text-align:center; padding:26px 10px;}
+  .sync-note{text-align:center; font-size:12px; color:#8A93A1; margin-top:18px; line-height:1.5;}
+  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
 </style>
 </head>
 <body>
+
+<!-- PINCODE -->
+<div class="pin" id="pin-scherm">
+  <h2 id="pin-titel">Even laden</h2>
+  <p id="pin-uitleg"></p>
+  <div class="pin-dots" id="pin-dots"><span></span><span></span><span></span><span></span></div>
+  <div class="keypad" id="keypad"></div>
+</div>
 
 <header>
   <div class="header-row">
     <div>
       <h1>AutoDoc</h1>
-      <p class="sub">Documenten en kosten van de auto, altijd bij de hand</p>
+      <p class="sub">Onze documenten, op één plek</p>
     </div>
     <button class="share-btn" onclick="deelApp()">Delen</button>
   </div>
-  <nav class="tabs">
-    <button class="active" data-tab="overzicht" onclick="wisselTab('overzicht')">Overzicht</button>
-    <button data-tab="documenten" onclick="wisselTab('documenten')">Documenten</button>
-    <button data-tab="kosten" onclick="wisselTab('kosten')">Kosten &amp; km</button>
-  </nav>
+  <nav class="tabs" id="tabs"></nav>
 </header>
 
 <main>
+  <!-- START -->
+  <section class="tab active" id="tab-start">
+    <div class="doc-card">
+      <div class="doc-top"><h3>Als er iets gebeurt</h3></div>
+      <div id="stappen-inhoud"></div>
+      <div class="doc-actions"><button class="btn grow" onclick="bewerkStappen()">Bewerk</button></div>
+    </div>
 
-  <!-- OVERZICHT -->
-  <section class="tab active" id="tab-overzicht">
-    <div id="overzicht-lijst"></div>
-    <p class="sync-note">Tik op een document voor het volledige scherm, klaar om te tonen.</p>
+    <div class="doc-card">
+      <div class="doc-top"><h3>Wie bellen</h3></div>
+      <div id="contacten-inhoud"></div>
+      <div class="doc-actions"><button class="btn grow" onclick="bewerkContacten()">Bewerk</button></div>
+    </div>
+
+    <div class="doc-card">
+      <div class="doc-top"><h3>Online inloggen</h3></div>
+      <a class="link-btn" href="https://www.izimi.be" target="_blank" rel="noopener">
+        <strong>Izimi, de documentenkluis</strong>
+        <span>Inloggen met itsme. Hier staan de gescande documenten.</span>
+      </a>
+      <a class="link-btn" href="https://www.myminfin.be" target="_blank" rel="noopener">
+        <strong>MyMinfin, belastingen</strong>
+        <span>Inloggen met itsme. Aanslagbiljetten en aangiftes.</span>
+      </a>
+    </div>
+
+    <button class="klein-link" onclick="wijzigPin()">Pincode wijzigen</button>
   </section>
 
-  <!-- DOCUMENTEN -->
-  <section class="tab" id="tab-documenten">
+  <!-- AUTO -->
+  <section class="tab" id="tab-auto">
     <div id="documenten-lijst"></div>
+    <p class="sync-note">Tik op Toon voor het volledige scherm, klaar om aan de politie te tonen.</p>
   </section>
+
+  <!-- CATEGORIEËN (worden in JS gevuld) -->
+  <div id="cat-secties"></div>
 
   <!-- KOSTEN & KM -->
   <section class="tab" id="tab-kosten">
     <div class="kosten-form">
       <div class="row">
         <select id="k-type">
-          <option value="Brandstof">Brandstof</option>
-          <option value="Onderhoud">Onderhoud</option>
-          <option value="Verzekering">Verzekering</option>
-          <option value="Keuring">Keuring</option>
-          <option value="Belasting">Belasting</option>
-          <option value="Andere">Andere</option>
+          <option>Brandstof</option><option>Onderhoud</option><option>Verzekering</option>
+          <option>Keuring</option><option>Belasting</option><option>Andere</option>
         </select>
         <input type="date" id="k-datum">
       </div>
@@ -308,37 +218,34 @@
         <input type="number" step="0.01" id="k-bedrag" placeholder="Bedrag (€)">
         <input type="number" id="k-km" placeholder="Kilometerstand">
       </div>
-      <div class="row">
-        <input type="text" id="k-notitie" placeholder="Notitie (optioneel)">
-      </div>
+      <div class="row"><input type="text" id="k-notitie" placeholder="Notitie (optioneel)"></div>
       <button class="btn primary" style="width:100%;" onclick="voegKostenToe()">+ Toevoegen</button>
     </div>
-
     <div class="totals" id="totals-rij"></div>
     <div id="kosten-lijst"></div>
   </section>
-
 </main>
 
-<!-- POLITIE MODAL -->
+<!-- BEKIJKEN -->
 <div class="police-modal" id="police-modal">
   <div class="p-top">
     <h2 id="police-title">Document</h2>
-    <button class="p-close" onclick="sluitPolitie()">✕</button>
+    <button class="p-close" onclick="sluitViewer()" aria-label="Sluiten">✕</button>
   </div>
   <img id="police-img" src="" alt="" style="display:none;">
   <iframe id="police-pdf" src="" style="display:none; width:100%; flex:1; border:none; background:#fff;"></iframe>
-  <div class="p-bottom">
-    <div id="police-sub"></div>
-    <button class="side-toggle-btn" id="police-toggle" style="display:none;" onclick="wisselZijde()">Toon achterkant</button>
-  </div>
+  <div class="p-bottom" id="police-sub"></div>
+</div>
+
+<!-- BEWERKVENSTER -->
+<div class="sheet" id="sheet" onclick="if(event.target===this) sluitSheet()">
+  <div class="sheet-body" id="sheet-body"></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 <script>
-  // === Firebase config: zelfde project "wiezen-club" als de andere apps ===
   const firebaseConfig = {
     apiKey: "AIzaSyC399MvSiF3PWF_ZTdFr0UqaoC6Fo7WsrY",
     authDomain: "wiezen-club.firebaseapp.com",
@@ -350,239 +257,400 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
   const storage = firebase.storage();
-
   const DOC_REF = db.collection('guides').doc('autodocumenten');
 
-  // Autodocumenten: één set voor de wagen. Persoonlijke documenten: apart per persoon.
-  const DOC_GROUPS = [
-    { titel:'Auto', docs:[
-        { key:'verzekering', label:'Verzekering' },
-        { key:'inschrijving', label:'Inschrijving (kenteken)' },
-        { key:'keuring', label:'Keuring' }
-      ]},
-    { titel:'Danny', docs:[
-        { key:'rijbewijs_danny', label:'Rijbewijs' },
-        { key:'idkaart_danny', label:'ID-kaart' },
-        { key:'paspoort_danny', label:'Paspoort' }
-      ]},
-    { titel:'Martine', docs:[
-        { key:'rijbewijs_martine', label:'Rijbewijs' },
-        { key:'idkaart_martine', label:'ID-kaart' },
-        { key:'paspoort_martine', label:'Paspoort' }
-      ]}
+  // ---- Auto (bestaand) ----
+  const DOC_TYPES = [
+    { key:'verzekering', label:'Verzekering' },
+    { key:'inschrijving', label:'Inschrijving (kenteken)' },
+    { key:'keuring', label:'Keuring' },
+    { key:'rijbewijs', label:'Rijbewijs' },
+    { key:'idkaart', label:'ID-kaart' }
   ];
 
-  function alleDocTypes(){
-    return DOC_GROUPS.flatMap(g=>g.docs);
-  }
+  // ---- Nieuwe categorieën ----
+  const CATS = [
+    { key:'woning', label:'Woning', items:[
+      ['huurcontract','Huurcontract'], ['plaatsbeschrijving','Plaatsbeschrijving'],
+      ['huurwaarborg','Huurwaarborg'], ['brandverzekering','Brandverzekering'],
+      ['reglement','Reglement van het gebouw'] ]},
+    { key:'persoonlijk', label:'Persoonlijk', items:[
+      ['zorgvolmacht','Zorgvolmacht'], ['paspoort','Paspoort'],
+      ['testament','Testament en wilsverklaringen'] ]},
+    { key:'financieel', label:'Financieel', items:[
+      ['bank','Bankrekeningen'], ['pensioen','Pensioen'], ['belastingen','Belastingen'],
+      ['hospitalisatie','Hospitalisatieverzekering'], ['levensverzekering','Levensverzekering'] ]},
+    { key:'abonnementen', label:'Abonnementen', items:[
+      ['energie','Energie'], ['telecom','Internet, tv en gsm'], ['water','Water'] ]},
+    { key:'wensen', label:'Wensen', items:[
+      ['uitvaart','Uitvaartwensen'], ['belangrijk','Wat ik belangrijk vind'] ]}
+  ];
 
-  let staat = { documenten:{}, kosten:[] };
-  let huidigeZijde = 'voor'; // voor politie-weergave toggle
+  const TABS = [
+    ['start','Start'], ['auto','Auto'],
+    ...CATS.map(c=>[c.key, c.label]),
+    ['kosten','Kosten & km']
+  ];
+
+  let staat = { documenten:{}, kosten:[], items:{}, extra:{}, contacten:[], stappen:'', pinHash:null };
+  let eersteLaad = true;
+
+  // ---- Hulpfuncties ----
+  function esc(s){
+    return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function telLink(t){ return 'tel:' + String(t).replace(/[^+\d]/g,''); }
+  function fmtDatum(iso){
+    if(!iso) return 'geen';
+    const d = new Date(iso);
+    return d.toLocaleDateString('nl-BE', { day:'2-digit', month:'2-digit', year:'numeric' });
+  }
+  function opslaan(){ DOC_REF.set(staat, { merge:true }); }
 
   // ---- Tabs ----
+  function bouwTabs(){
+    const nav = document.getElementById('tabs');
+    nav.innerHTML = TABS.map(([k,l],i)=>`<button data-tab="${k}" class="${i===0?'active':''}" onclick="wisselTab('${k}')">${esc(l)}</button>`).join('');
+    document.getElementById('cat-secties').innerHTML = CATS.map(c=>`
+      <section class="tab" id="tab-${c.key}">
+        <div id="lijst-${c.key}"></div>
+        <button class="add-btn" onclick="voegItemToe('${c.key}')">+ Ander onderdeel toevoegen</button>
+      </section>`).join('');
+  }
   function wisselTab(naam){
     document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===naam));
     document.querySelectorAll('section.tab').forEach(s=>s.classList.toggle('active', s.id==='tab-'+naam));
+    window.scrollTo(0,0);
   }
 
   // ---- Live sync ----
   DOC_REF.onSnapshot(snap=>{
-    if(snap.exists){
-      const data = snap.data();
-      staat.documenten = data.documenten || {};
-      staat.kosten = data.kosten || [];
-    } else {
-      staat = { documenten:{}, kosten:[] };
-    }
-    migreerOudeSleutels();
-    renderOverzicht();
-    renderDocumenten();
-    renderKosten();
+    const d = snap.exists ? snap.data() : {};
+    staat = {
+      documenten: d.documenten || {}, kosten: d.kosten || [],
+      items: d.items || {}, extra: d.extra || {},
+      contacten: d.contacten || [], stappen: d.stappen || '',
+      pinHash: d.pinHash || null
+    };
+    if(eersteLaad){ eersteLaad = false; startPin(); }
+    renderAlles();
   });
 
-  function opslaan(){
-    DOC_REF.set(staat, { merge:true });
+  function renderAlles(){
+    renderStart();
+    renderDocumenten();
+    CATS.forEach(renderCat);
+    renderKosten();
   }
 
-  // ---- Migratie: bestaande rijbewijs/idkaart/paspoort (zonder persoon) worden Danny's documenten ----
-  function migreerOudeSleutels(){
-    const oudNaarNieuw = { rijbewijs:'rijbewijs_danny', idkaart:'idkaart_danny', paspoort:'paspoort_danny' };
-    let gewijzigd = false;
-    Object.keys(oudNaarNieuw).forEach(oud=>{
-      const nieuw = oudNaarNieuw[oud];
-      if(staat.documenten[oud] && !staat.documenten[nieuw]){
-        staat.documenten[nieuw] = staat.documenten[oud];
-        delete staat.documenten[oud];
-        gewijzigd = true;
-      }
-    });
-    if(gewijzigd) opslaan();
+  // ---- Pincode ----
+  let pinModus = 'invoer', pinBuffer = '', pinEerste = '';
+  async function hashPin(p){
+    const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('autodoc:' + p));
+    return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
   }
-
-  // ---- Migratie: oude documenten (enkel fotoUrl) krijgen een modus, en meteen wegschrijven ----
-  function genormaliseerd(key){
-    const d = staat.documenten[key] || {};
-    if(!d.modus){
-      if(d.bestandType === 'application/pdf'){
-        d.modus = 'pdf';
-        d.pdfUrl = d.fotoUrl;
+  function bouwKeypad(){
+    const toetsen = ['1','2','3','4','5','6','7','8','9','','0','wis'];
+    document.getElementById('keypad').innerHTML = toetsen.map(t=>{
+      if(t==='') return `<button class="leeg-knop" tabindex="-1" aria-hidden="true"></button>`;
+      if(t==='wis') return `<button class="wis" onclick="pinWis()">Wis</button>`;
+      return `<button onclick="pinDruk('${t}')">${t}</button>`;
+    }).join('');
+  }
+  function toonPinScherm(titel, uitleg){
+    document.getElementById('pin-titel').textContent = titel;
+    document.getElementById('pin-uitleg').textContent = uitleg;
+    pinBuffer = ''; tekenDots();
+    document.getElementById('pin-scherm').classList.remove('verborgen');
+  }
+  function verbergPin(){ document.getElementById('pin-scherm').classList.add('verborgen'); }
+  function startPin(){
+    let open = false;
+    try{ open = sessionStorage.getItem('autodoc-open') === '1'; }catch(e){}
+    if(!staat.pinHash){ pinModus = 'nieuw1'; toonPinScherm('Kies een pincode', 'Vier cijfers. Deze vraagt de app bij elke opening.'); }
+    else if(open){ verbergPin(); }
+    else { pinModus = 'invoer'; toonPinScherm('Pincode', 'Geef de pincode van vier cijfers in.'); }
+  }
+  function wijzigPin(){ pinModus = 'nieuw1'; toonPinScherm('Nieuwe pincode', 'Kies vier nieuwe cijfers.'); }
+  function tekenDots(){
+    document.querySelectorAll('#pin-dots span').forEach((s,i)=>s.classList.toggle('vol', i < pinBuffer.length));
+  }
+  function pinFout(tekst){
+    const dots = document.getElementById('pin-dots');
+    dots.classList.remove('fout'); void dots.offsetWidth; dots.classList.add('fout');
+    document.getElementById('pin-uitleg').textContent = tekst;
+    pinBuffer = ''; tekenDots();
+  }
+  function pinWis(){ pinBuffer = pinBuffer.slice(0,-1); tekenDots(); }
+  async function pinDruk(c){
+    if(pinBuffer.length >= 4) return;
+    pinBuffer += c; tekenDots();
+    if(pinBuffer.length < 4) return;
+    const code = pinBuffer;
+    if(pinModus === 'invoer'){
+      if(await hashPin(code) === staat.pinHash){
+        try{ sessionStorage.setItem('autodoc-open','1'); }catch(e){}
+        verbergPin();
+      } else pinFout('Verkeerde pincode. Probeer opnieuw.');
+    } else if(pinModus === 'nieuw1'){
+      pinEerste = code; pinModus = 'nieuw2';
+      toonPinScherm('Herhaal pincode', 'Geef dezelfde vier cijfers nog eens in.');
+    } else if(pinModus === 'nieuw2'){
+      if(code === pinEerste){
+        staat.pinHash = await hashPin(code);
         opslaan();
-      } else if(d.fotoUrl){
-        // oude losse foto wordt de voorkant
-        d.modus = 'foto';
-        d.voorUrl = d.fotoUrl;
-        opslaan();
+        try{ sessionStorage.setItem('autodoc-open','1'); }catch(e){}
+        verbergPin();
+      } else {
+        pinModus = 'nieuw1';
+        toonPinScherm('Kies een pincode', 'De twee codes waren niet gelijk. Begin opnieuw.');
       }
     }
-    return d;
   }
 
-  // ---- Status logica ----
+  // ---- Start ----
+  function renderStart(){
+    const st = document.getElementById('stappen-inhoud');
+    st.innerHTML = staat.stappen
+      ? `<p class="notitie">${esc(staat.stappen)}</p>`
+      : `<p class="leeg">Nog niets ingevuld. Schrijf hier wat er eerst moet gebeuren.</p>`;
+
+    const ct = document.getElementById('contacten-inhoud');
+    if(!staat.contacten.length){
+      ct.innerHTML = `<p class="leeg">Nog geen contacten. Voeg bv. notaris, verzekeraar, bank en huisarts toe.</p>`;
+      return;
+    }
+    ct.innerHTML = staat.contacten.map(c=>`
+      <div class="contact-row">
+        <div>
+          <div class="c-naam">${esc(c.naam)}</div>
+          ${c.rol ? `<div class="c-rol">${esc(c.rol)}</div>` : ''}
+        </div>
+        ${c.tel ? `<a class="bel-btn" href="${telLink(c.tel)}">Bel</a>` : ''}
+      </div>`).join('');
+  }
+
+  function bewerkStappen(){
+    openSheet(`
+      <h2>Als er iets gebeurt</h2>
+      <div class="veld">
+        <label for="f-stappen">Wat moet er eerst gebeuren?</label>
+        <textarea id="f-stappen" style="min-height:220px;">${esc(staat.stappen)}</textarea>
+      </div>
+      <div class="sheet-acties">
+        <button class="btn grow" onclick="sluitSheet()">Annuleer</button>
+        <button class="btn primary grow" onclick="bewaarStappen()">Bewaar</button>
+      </div>`);
+  }
+  function bewaarStappen(){
+    staat.stappen = document.getElementById('f-stappen').value.trim();
+    opslaan(); sluitSheet();
+  }
+
+  let contactKlad = [];
+  function bewerkContacten(){
+    contactKlad = staat.contacten.map(c=>({...c}));
+    tekenContactSheet();
+  }
+  function tekenContactSheet(){
+    openSheet(`
+      <h2>Wie bellen</h2>
+      <div id="contact-lijst">
+        ${contactKlad.map((c,i)=>`
+          <div class="contact-edit">
+            <input placeholder="Naam" value="${esc(c.naam)}" oninput="contactKlad[${i}].naam=this.value">
+            <input placeholder="Wie is dit (bv. notaris)" value="${esc(c.rol)}" oninput="contactKlad[${i}].rol=this.value">
+            <input placeholder="Telefoon" type="tel" value="${esc(c.tel)}" oninput="contactKlad[${i}].tel=this.value">
+            <button class="btn danger" onclick="contactKlad.splice(${i},1); tekenContactSheet()">Verwijder</button>
+          </div>`).join('')}
+      </div>
+      <button class="btn" style="width:100%;" onclick="contactKlad.push({naam:'',rol:'',tel:''}); tekenContactSheet()">+ Contact toevoegen</button>
+      <div class="sheet-acties">
+        <button class="btn grow" onclick="sluitSheet()">Annuleer</button>
+        <button class="btn primary grow" onclick="bewaarContacten()">Bewaar</button>
+      </div>`);
+  }
+  function bewaarContacten(){
+    staat.contacten = contactKlad
+      .map(c=>({ naam:(c.naam||'').trim(), rol:(c.rol||'').trim(), tel:(c.tel||'').trim() }))
+      .filter(c=>c.naam);
+    opslaan(); sluitSheet();
+  }
+
+  // ---- Categorieën ----
+  function itemsVan(cat){
+    return cat.items.map(([key,label])=>({key,label,extra:false}))
+      .concat((staat.extra[cat.key]||[]).map(x=>({...x, extra:true})));
+  }
+
+  function renderCat(cat){
+    const el = document.getElementById('lijst-'+cat.key);
+    if(!el) return;
+    el.innerHTML = itemsVan(cat).map(it=>{
+      const d = staat.items[it.key] || {};
+      const ingevuld = d.waar || d.contact || d.telefoon || d.notitie || d.fotoUrl;
+      let inhoud = '';
+      if(d.waar) inhoud += `<p class="info"><span class="lbl">Waar ligt het</span>${esc(d.waar)}</p>`;
+      if(d.contact || d.telefoon){
+        inhoud += `<p class="info"><span class="lbl">Contact</span>${esc(d.contact||'')}${d.telefoon ? ` <a href="${telLink(d.telefoon)}">${esc(d.telefoon)}</a>` : ''}</p>`;
+      }
+      if(d.notitie) inhoud += `<p class="notitie">${esc(d.notitie)}</p>`;
+      if(!ingevuld) inhoud = `<p class="leeg">Nog niets ingevuld.</p>`;
+      return `
+        <div class="doc-card">
+          <div class="doc-top">
+            <h3>${esc(it.label)}</h3>
+            <span class="status-pill ${ingevuld ? 'status-ok' : 'status-none'}">${ingevuld ? 'Ingevuld' : 'Leeg'}</span>
+          </div>
+          ${inhoud}
+          <div class="doc-actions">
+            ${d.fotoUrl ? `<button class="btn police" onclick="toonItem('${it.key}','${esc(it.label)}')">Bekijk document</button>` : ''}
+            <button class="btn ${d.fotoUrl ? '' : 'grow'}" onclick="bewerkItem('${cat.key}','${it.key}')">Bewerk</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function voegItemToe(catKey){
+    const naam = prompt('Naam van het onderdeel (bv. Netflix, spaarrekening):');
+    if(!naam || !naam.trim()) return;
+    if(!staat.extra[catKey]) staat.extra[catKey] = [];
+    const key = 'x' + Date.now();
+    staat.extra[catKey].push({ key, label:naam.trim() });
+    opslaan();
+    setTimeout(()=>bewerkItem(catKey, key), 50);
+  }
+
+  function bewerkItem(catKey, key){
+    const cat = CATS.find(c=>c.key===catKey);
+    const it = itemsVan(cat).find(x=>x.key===key);
+    if(!it) return;
+    const d = staat.items[key] || {};
+    openSheet(`
+      <h2>${esc(it.label)}</h2>
+      <div class="veld"><label for="f-waar">Waar ligt het</label>
+        <input id="f-waar" value="${esc(d.waar)}" placeholder="bv. In Izimi, of blauwe map in de kast"></div>
+      <div class="veld"><label for="f-contact">Contactpersoon of firma</label>
+        <input id="f-contact" value="${esc(d.contact)}" placeholder="bv. verzekeraar, polisnummer"></div>
+      <div class="veld"><label for="f-tel">Telefoon</label>
+        <input id="f-tel" type="tel" value="${esc(d.telefoon)}"></div>
+      <div class="veld"><label for="f-notitie">Wat moet je weten</label>
+        <textarea id="f-notitie">${esc(d.notitie)}</textarea></div>
+
+      <label class="btn" style="width:100%;">
+        ${d.fotoUrl ? 'Vervang foto of PDF' : '+ Foto of PDF toevoegen'}
+        <input type="file" accept="image/*,application/pdf" onchange="uploadItem('${catKey}','${key}', this.files[0])">
+      </label>
+      <p class="hint">Gevoelige stukken zoals de zorgvolmacht of ID bewaar je beter in Izimi. Schrijf dan bij "Waar ligt het" gewoon "In Izimi".</p>
+      <p class="hint" id="upload-status"></p>
+
+      <div class="sheet-acties">
+        <button class="btn grow" onclick="sluitSheet()">Annuleer</button>
+        <button class="btn primary grow" onclick="bewaarItem('${key}')">Bewaar</button>
+      </div>
+      ${it.extra ? `<div class="sheet-acties"><button class="btn danger grow" onclick="verwijderItem('${catKey}','${key}')">Verwijder dit onderdeel</button></div>` : ''}
+    `);
+  }
+
+  function bewaarItem(key){
+    const vorig = staat.items[key] || {};
+    staat.items[key] = {
+      ...vorig,
+      waar: document.getElementById('f-waar').value.trim(),
+      contact: document.getElementById('f-contact').value.trim(),
+      telefoon: document.getElementById('f-tel').value.trim(),
+      notitie: document.getElementById('f-notitie').value.trim()
+    };
+    opslaan(); sluitSheet();
+  }
+
+  function verwijderItem(catKey, key){
+    if(!confirm('Dit onderdeel verwijderen?')) return;
+    staat.extra[catKey] = (staat.extra[catKey]||[]).filter(x=>x.key!==key);
+    staat.items[key] = {};
+    opslaan(); sluitSheet();
+  }
+
+  async function uploadItem(catKey, key, file){
+    if(!file) return;
+    const status = document.getElementById('upload-status');
+    if(status) status.textContent = 'Bezig met opladen...';
+    try{
+      const url = await laadOp(`documenten/${key}`, file);
+      const vorig = staat.items[key] || {};
+      staat.items[key] = {
+        ...vorig,
+        waar: document.getElementById('f-waar')?.value.trim() ?? vorig.waar,
+        contact: document.getElementById('f-contact')?.value.trim() ?? vorig.contact,
+        telefoon: document.getElementById('f-tel')?.value.trim() ?? vorig.telefoon,
+        notitie: document.getElementById('f-notitie')?.value.trim() ?? vorig.notitie,
+        fotoUrl: url, bestandType: file.type, bijgewerkt: new Date().toISOString()
+      };
+      opslaan();
+      if(status) status.textContent = 'Opgeladen.';
+    } catch(err){
+      console.error(err);
+      if(status) status.textContent = 'Opladen mislukt: ' + (err.code || err.message || err);
+    }
+  }
+
+  function toonItem(key, label){
+    const d = staat.items[key] || {};
+    if(!d.fotoUrl) return;
+    toonBestand(d.fotoUrl, d.bestandType, label, d.waar ? 'Origineel: ' + d.waar : '');
+  }
+
+  // ---- Bewerkvenster ----
+  function openSheet(html){
+    document.getElementById('sheet-body').innerHTML = html;
+    document.getElementById('sheet').classList.add('active');
+  }
+  function sluitSheet(){ document.getElementById('sheet').classList.remove('active'); }
+
+  // ---- Auto-documenten (bestaand) ----
   function statusVoor(vervaldatum){
     if(!vervaldatum) return { klasse:'status-none', tekst:'Geen datum' };
-    const vandaag = new Date();
-    const dv = new Date(vervaldatum);
-    const dagenVerschil = Math.floor((dv - vandaag) / (1000*60*60*24));
-    if(dagenVerschil < 0) return { klasse:'status-danger', tekst:'Verlopen' };
-    if(dagenVerschil <= 30) return { klasse:'status-warn', tekst:`Nog ${dagenVerschil} dagen` };
+    const dagen = Math.floor((new Date(vervaldatum) - new Date()) / 86400000);
+    if(dagen < 0) return { klasse:'status-danger', tekst:'Verlopen' };
+    if(dagen <= 30) return { klasse:'status-warn', tekst:`Nog ${dagen} dagen` };
     return { klasse:'status-ok', tekst:'Geldig' };
   }
 
-  function fmtDatum(iso){
-    if(!iso) return '—';
-    const d = new Date(iso);
-    return d.toLocaleDateString('nl-BE', { day:'2-digit', month:'2-digit', year:'numeric' });
-  }
-
-  function heeftInhoud(d){
-    return !!(d.voorUrl || d.achterUrl || d.pdfUrl);
-  }
-
-  // ---- Overzicht ----
-  function renderOverzicht(){
-    const el = document.getElementById('overzicht-lijst');
-    el.innerHTML = '';
-    DOC_GROUPS.forEach(groep=>{
-      const kop = document.createElement('div');
-      kop.className = 'group-heading';
-      kop.textContent = groep.titel;
-      el.appendChild(kop);
-
-      groep.docs.forEach(t=>{
-        const d = genormaliseerd(t.key);
-        const s = statusVoor(d.vervaldatum);
-        const kaart = document.createElement('div');
-        kaart.className = 'overview-card';
-        kaart.innerHTML = `
-          <div class="ov-left">
-            <h3>${t.label}</h3>
-            <span class="ov-sub">Vervalt: ${fmtDatum(d.vervaldatum)}</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span class="status-pill ${s.klasse}">${s.tekst}</span>
-          </div>
-        `;
-        if(heeftInhoud(d)){
-          kaart.style.cursor = 'pointer';
-          kaart.onclick = ()=>toonPolitie(t.key);
-        } else {
-          kaart.onclick = ()=>wisselTab('documenten');
-        }
-        el.appendChild(kaart);
-      });
-    });
-  }
-
-  // ---- Documenten tab ----
   function renderDocumenten(){
     const el = document.getElementById('documenten-lijst');
     el.innerHTML = '';
-    DOC_GROUPS.forEach(groep=>{
-      const kop = document.createElement('div');
-      kop.className = 'group-heading';
-      kop.textContent = groep.titel;
-      el.appendChild(kop);
-
-      groep.docs.forEach(t=>{
-        const d = genormaliseerd(t.key);
-        const s = statusVoor(d.vervaldatum);
-        const modus = d.modus || 'foto';
-
-        const kaart = document.createElement('div');
-        kaart.className = 'doc-card';
-
-        let inhoudHtml = '';
-        if(modus === 'pdf'){
-          inhoudHtml = `
-            <div class="pdf-thumb-row">
-              <div class="pdf-thumb">${d.pdfUrl ? 'PDF' : 'geen'}</div>
-              <div class="pdf-actions">
-                <label class="btn-mini" style="flex:1;">
-                  ${d.pdfUrl ? 'Vervang' : '+ PDF'}
-                  <input type="file" accept="application/pdf" onchange="uploadPdf('${t.key}', this.files[0])">
-                </label>
-                ${d.pdfUrl ? `<button class="btn-mini verwijder" onclick="verwijderPdf('${t.key}')">Verwijder</button>` : ''}
-              </div>
-            </div>
-            <button class="mode-switch" onclick="wisselModus('${t.key}','foto')">Foto's gebruiken i.p.v. PDF</button>
-          `;
-        } else {
-          inhoudHtml = `
-            <div class="sides-row">
-              <div class="side-slot">
-                <div class="side-label">Voorkant</div>
-                ${d.voorUrl
-                  ? `<img class="side-thumb" src="${d.voorUrl}">`
-                  : `<div class="side-thumb empty">geen foto</div>`}
-                <div class="side-buttons">
-                  <label class="btn-mini">
-                    ${d.voorUrl ? 'Vervang' : '+ Foto'}
-                    <input type="file" accept="image/*" onchange="uploadZijde('${t.key}','voor', this.files[0])">
-                  </label>
-                  ${d.voorUrl ? `<button class="btn-mini verwijder" onclick="verwijderZijde('${t.key}','voor')">Verwijder</button>` : ''}
-                </div>
-              </div>
-              <div class="side-slot">
-                <div class="side-label">Achterkant</div>
-                ${d.achterUrl
-                  ? `<img class="side-thumb" src="${d.achterUrl}">`
-                  : `<div class="side-thumb empty">geen foto</div>`}
-                <div class="side-buttons">
-                  <label class="btn-mini">
-                    ${d.achterUrl ? 'Vervang' : '+ Foto'}
-                    <input type="file" accept="image/*" onchange="uploadZijde('${t.key}','achter', this.files[0])">
-                  </label>
-                  ${d.achterUrl ? `<button class="btn-mini verwijder" onclick="verwijderZijde('${t.key}','achter')">Verwijder</button>` : ''}
-                </div>
-              </div>
-            </div>
-            <button class="mode-switch" onclick="wisselModus('${t.key}','pdf')">PDF gebruiken i.p.v. foto's</button>
-          `;
-        }
-
-        kaart.innerHTML = `
-          <div class="doc-top">
-            <h3>${t.label}</h3>
-            <span class="status-pill ${s.klasse}">${s.tekst}</span>
-          </div>
+    DOC_TYPES.forEach(t=>{
+      const d = staat.documenten[t.key] || {};
+      const s = statusVoor(d.vervaldatum);
+      const kaart = document.createElement('div');
+      kaart.className = 'doc-card';
+      kaart.innerHTML = `
+        <div class="doc-top">
+          <h3>${t.label}</h3>
+          <span class="status-pill ${s.klasse}">${s.tekst}</span>
+        </div>
+        <div class="doc-thumb-row">
+          ${d.fotoUrl
+            ? (d.bestandType === 'application/pdf'
+                ? `<div class="doc-thumb empty">PDF</div>`
+                : `<img class="doc-thumb" src="${d.fotoUrl}" alt="">`)
+            : `<div class="doc-thumb empty">geen foto</div>`}
           <div class="doc-meta">
             <div class="field-line">
               Vervaldatum: <span class="val">${fmtDatum(d.vervaldatum)}</span>
-              <button class="pencil" onclick="wijzigVervaldatum('${t.key}')">✎</button>
+              <button class="pencil" onclick="wijzigVervaldatum('${t.key}')" aria-label="Vervaldatum wijzigen">✎</button>
             </div>
           </div>
-          ${inhoudHtml}
-          ${heeftInhoud(d) ? `<div class="doc-actions"><button class="btn police" onclick="toonPolitie('${t.key}')">Toon</button></div>` : ''}
-        `;
-        el.appendChild(kaart);
-      });
+        </div>
+        <div class="doc-actions">
+          <label class="btn grow">
+            ${d.fotoUrl ? 'Vervang foto' : '+ Foto/PDF'}
+            <input type="file" accept="image/*,application/pdf" onchange="uploadDocument('${t.key}', this.files[0])">
+          </label>
+          ${d.fotoUrl ? `<button class="btn police" onclick="toonAuto('${t.key}')">Toon</button>` : ''}
+        </div>`;
+      el.appendChild(kaart);
     });
-  }
-
-  function wisselModus(key, nieuweModus){
-    if(!staat.documenten[key]) staat.documenten[key] = {};
-    staat.documenten[key].modus = nieuweModus;
-    opslaan();
   }
 
   function wijzigVervaldatum(key){
@@ -594,79 +662,47 @@
     opslaan();
   }
 
-  async function uploadZijde(key, zijde, file){
+  async function uploadDocument(key, file){
     if(!file) return;
     try{
-      const gecomprimeerd = await comprimeerAfbeelding(file);
-      const pad = `autodoc/${key}/${zijde}_${Date.now()}_${file.name}`;
-      const ref = storage.ref(pad);
-      await ref.put(gecomprimeerd);
-      const url = await ref.getDownloadURL();
+      const url = await laadOp(`autodoc/${key}`, file);
       if(!staat.documenten[key]) staat.documenten[key] = {};
-      staat.documenten[key].modus = 'foto';
-      if(zijde === 'voor') staat.documenten[key].voorUrl = url;
-      else staat.documenten[key].achterUrl = url;
-      staat.documenten[key].bijgewerkt = new Date().toISOString();
+      Object.assign(staat.documenten[key], { fotoUrl:url, bestandType:file.type, bijgewerkt:new Date().toISOString() });
       opslaan();
     } catch(err){
       console.error(err);
-      alert('Upload mislukt: ' + (err.code || err.message || err) + '\n\nControleer de Storage-rules in de Firebase Console.');
+      alert('Opladen mislukt: ' + (err.code || err.message || err) + '\n\nControleer de Storage-regels in de Firebase Console.');
     }
   }
 
-  async function uploadPdf(key, file){
-    if(!file) return;
-    try{
-      const pad = `autodoc/${key}/pdf_${Date.now()}_${file.name}`;
-      const ref = storage.ref(pad);
-      await ref.put(file);
-      const url = await ref.getDownloadURL();
-      if(!staat.documenten[key]) staat.documenten[key] = {};
-      staat.documenten[key].modus = 'pdf';
-      staat.documenten[key].pdfUrl = url;
-      staat.documenten[key].bijgewerkt = new Date().toISOString();
-      opslaan();
-    } catch(err){
-      console.error(err);
-      alert('Upload mislukt: ' + (err.code || err.message || err) + '\n\nControleer de Storage-rules in de Firebase Console.');
-    }
+  function toonAuto(key){
+    const t = DOC_TYPES.find(x=>x.key===key);
+    const d = staat.documenten[key] || {};
+    if(!d.fotoUrl) return;
+    toonBestand(d.fotoUrl, d.bestandType, t.label, 'Geldig tot ' + fmtDatum(d.vervaldatum));
   }
 
-  function verwijderZijde(key, zijde){
-    if(!staat.documenten[key]) return;
-    if(!confirm('Deze foto verwijderen?')) return;
-    const veld = zijde === 'voor' ? 'voorUrl' : 'achterUrl';
-    staat.documenten[key][veld] = firebase.firestore.FieldValue.delete();
-    opslaan();
-    delete staat.documenten[key][veld];
-    renderOverzicht();
-    renderDocumenten();
-  }
-
-  function verwijderPdf(key){
-    if(!staat.documenten[key]) return;
-    if(!confirm('Deze PDF verwijderen?')) return;
-    staat.documenten[key].pdfUrl = firebase.firestore.FieldValue.delete();
-    opslaan();
-    delete staat.documenten[key].pdfUrl;
-    renderOverzicht();
-    renderDocumenten();
+  // ---- Opladen en bekijken ----
+  async function laadOp(map, file){
+    let bestand = file;
+    if(file.type.startsWith('image/')) bestand = await comprimeerAfbeelding(file);
+    const ref = storage.ref(`${map}/${Date.now()}_${file.name}`);
+    await ref.put(bestand);
+    return await ref.getDownloadURL();
   }
 
   function comprimeerAfbeelding(file){
-    return new Promise((resolve)=>{
+    return new Promise(resolve=>{
       const reader = new FileReader();
-      reader.onload = (e)=>{
+      reader.onload = e=>{
         const img = new Image();
         img.onload = ()=>{
-          const maxBreedte = 1400;
-          const schaal = Math.min(1, maxBreedte / img.width);
+          const schaal = Math.min(1, 1400 / img.width);
           const canvas = document.createElement('canvas');
           canvas.width = img.width * schaal;
           canvas.height = img.height * schaal;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          canvas.toBlob(blob=> resolve(blob), 'image/jpeg', 0.82);
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob(blob=>resolve(blob), 'image/jpeg', 0.82);
         };
         img.src = e.target.result;
       };
@@ -674,52 +710,21 @@
     });
   }
 
-  // ---- Politie-weergave ----
-  function toonPolitie(key){
-    const t = alleDocTypes().find(x=>x.key===key);
-    const d = genormaliseerd(key);
-    if(!heeftInhoud(d)) return;
-
-    document.getElementById('police-title').textContent = t.label;
-    window._policeKey = key;
-
+  function toonBestand(url, type, titel, sub){
+    document.getElementById('police-title').textContent = titel;
     const imgEl = document.getElementById('police-img');
     const pdfEl = document.getElementById('police-pdf');
-    const toggleEl = document.getElementById('police-toggle');
-
-    if(d.modus === 'pdf'){
-      imgEl.style.display = 'none';
-      imgEl.src = '';
-      pdfEl.style.display = 'block';
-      pdfEl.src = d.pdfUrl;
-      toggleEl.style.display = 'none';
+    if(type === 'application/pdf'){
+      imgEl.style.display = 'none'; imgEl.src = '';
+      pdfEl.style.display = 'block'; pdfEl.src = url;
     } else {
-      pdfEl.style.display = 'none';
-      pdfEl.src = '';
-      huidigeZijde = d.voorUrl ? 'voor' : 'achter';
-      toonZijde(d);
-      toggleEl.style.display = (d.voorUrl && d.achterUrl) ? 'inline-block' : 'none';
+      pdfEl.style.display = 'none'; pdfEl.src = '';
+      imgEl.style.display = 'block'; imgEl.src = url;
     }
-
-    document.getElementById('police-sub').textContent = 'Geldig tot ' + fmtDatum(d.vervaldatum);
+    document.getElementById('police-sub').textContent = sub || '';
     document.getElementById('police-modal').classList.add('active');
   }
-
-  function toonZijde(d){
-    const imgEl = document.getElementById('police-img');
-    const toggleEl = document.getElementById('police-toggle');
-    imgEl.style.display = 'block';
-    imgEl.src = huidigeZijde === 'voor' ? d.voorUrl : d.achterUrl;
-    toggleEl.textContent = huidigeZijde === 'voor' ? 'Toon achterkant' : 'Toon voorkant';
-  }
-
-  function wisselZijde(){
-    const d = genormaliseerd(window._policeKey);
-    huidigeZijde = huidigeZijde === 'voor' ? 'achter' : 'voor';
-    toonZijde(d);
-  }
-
-  function sluitPolitie(){
+  function sluitViewer(){
     document.getElementById('police-modal').classList.remove('active');
     document.getElementById('police-pdf').src = '';
   }
@@ -732,99 +737,48 @@
     const km = document.getElementById('k-km').value ? parseInt(document.getElementById('k-km').value) : null;
     const notitie = document.getElementById('k-notitie').value.trim();
     if(bedrag <= 0 && !km){ alert('Vul minstens een bedrag of kilometerstand in.'); return; }
-
-    staat.kosten.push({
-      id: Date.now().toString(),
-      type, datum, bedrag, km, notitie
-    });
+    staat.kosten.push({ id:Date.now().toString(), type, datum, bedrag, km, notitie });
     opslaan();
-
-    document.getElementById('k-bedrag').value = '';
-    document.getElementById('k-km').value = '';
-    document.getElementById('k-notitie').value = '';
+    ['k-bedrag','k-km','k-notitie'].forEach(id=>document.getElementById(id).value='');
   }
-
   function verwijderKosten(id){
     staat.kosten = staat.kosten.filter(k=>k.id !== id);
     opslaan();
   }
-
   function renderKosten(){
     const totalsEl = document.getElementById('totals-rij');
     const lijstEl = document.getElementById('kosten-lijst');
-
-    const perType = {};
-    let totaal = 0;
-    staat.kosten.forEach(k=>{
-      perType[k.type] = (perType[k.type]||0) + (k.bedrag||0);
-      totaal += (k.bedrag||0);
-    });
-
-    totalsEl.innerHTML = '';
-    Object.keys(perType).forEach(type=>{
-      const chip = document.createElement('span');
-      chip.className = 'total-chip';
-      chip.textContent = `${type}: € ${perType[type].toFixed(2)}`;
-      totalsEl.appendChild(chip);
-    });
-    if(staat.kosten.length){
-      const grand = document.createElement('span');
-      grand.className = 'total-chip grand';
-      grand.textContent = `Totaal: € ${totaal.toFixed(2)}`;
-      totalsEl.appendChild(grand);
-    }
-
-    if(!staat.kosten.length){
-      lijstEl.innerHTML = '<p class="empty-state">Nog geen kosten toegevoegd.</p>';
-      return;
-    }
-
-    const gesorteerd = [...staat.kosten].sort((a,b)=> (b.datum||'').localeCompare(a.datum||''));
-    lijstEl.innerHTML = '';
-    gesorteerd.forEach(k=>{
-      const item = document.createElement('div');
-      item.className = 'kosten-item';
-      const subDelen = [fmtDatum(k.datum)];
-      if(k.km) subDelen.push(`${k.km} km`);
-      if(k.notitie) subDelen.push(k.notitie);
-      item.innerHTML = `
-        <div class="ki-left">
-          <span class="ki-type">${k.type}</span>
-          <span class="ki-sub">${subDelen.join(' · ')}</span>
-        </div>
-        <div style="display:flex; align-items:center;">
-          <span class="ki-amount">${k.bedrag ? '€ ' + k.bedrag.toFixed(2) : '—'}</span>
-          <button class="ki-del" onclick="verwijderKosten('${k.id}')">Verwijder</button>
-        </div>
-      `;
-      lijstEl.appendChild(item);
-    });
+    const perType = {}; let totaal = 0;
+    staat.kosten.forEach(k=>{ perType[k.type] = (perType[k.type]||0) + (k.bedrag||0); totaal += (k.bedrag||0); });
+    totalsEl.innerHTML = Object.keys(perType).map(t=>`<span class="total-chip">${esc(t)}: € ${perType[t].toFixed(2)}</span>`).join('')
+      + (staat.kosten.length ? `<span class="total-chip grand">Totaal: € ${totaal.toFixed(2)}</span>` : '');
+    if(!staat.kosten.length){ lijstEl.innerHTML = '<p class="empty-state">Nog geen kosten toegevoegd.</p>'; return; }
+    lijstEl.innerHTML = [...staat.kosten].sort((a,b)=>(b.datum||'').localeCompare(a.datum||'')).map(k=>{
+      const sub = [fmtDatum(k.datum)];
+      if(k.km) sub.push(`${k.km} km`);
+      if(k.notitie) sub.push(esc(k.notitie));
+      return `
+        <div class="kosten-item">
+          <div class="ki-left">
+            <span class="ki-type">${esc(k.type)}</span>
+            <span class="ki-sub">${sub.join(', ')}</span>
+          </div>
+          <div style="display:flex; align-items:center;">
+            <span class="ki-amount">${k.bedrag ? '€ ' + k.bedrag.toFixed(2) : ''}</span>
+            <button class="ki-del" onclick="verwijderKosten('${k.id}')">Verwijder</button>
+          </div>
+        </div>`;
+    }).join('');
   }
 
   // ---- Delen ----
   function deelApp(){
-    if(navigator.share){
-      navigator.share({ title:'AutoDoc', url: window.location.href });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert('Link gekopieerd.');
-    }
+    if(navigator.share) navigator.share({ title:'AutoDoc', url: window.location.href });
+    else { navigator.clipboard.writeText(window.location.href); alert('Link gekopieerd.'); }
   }
 
-  // Expose voor inline onclick (compat SDK, geen modules)
-  window.wisselTab = wisselTab;
-  window.wijzigVervaldatum = wijzigVervaldatum;
-  window.wisselModus = wisselModus;
-  window.uploadZijde = uploadZijde;
-  window.uploadPdf = uploadPdf;
-  window.verwijderZijde = verwijderZijde;
-  window.verwijderPdf = verwijderPdf;
-  window.toonPolitie = toonPolitie;
-  window.wisselZijde = wisselZijde;
-  window.sluitPolitie = sluitPolitie;
-  window.voegKostenToe = voegKostenToe;
-  window.verwijderKosten = verwijderKosten;
-  window.deelApp = deelApp;
+  bouwTabs();
+  bouwKeypad();
 </script>
 </body>
 </html>

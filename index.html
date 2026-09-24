@@ -278,7 +278,11 @@
       ['zorgvolmacht','Zorgvolmacht'], ['paspoort','Paspoort'],
       ['testament','Testament en wilsverklaringen'] ]},
     { key:'financieel', label:'Financieel', items:[
-      ['bank','Bankrekeningen'], ['pensioen','Pensioen'], ['belastingen','Belastingen'],
+      ['bank','Bankrekeningen', [
+        ['BNP Paribas Fortis', 'Easy Banking App', 'https://apps.apple.com/be/app/easy-banking-app/id516502006'],
+        ['KBC', 'KBC Mobile', 'https://apps.apple.com/be/app/kbc-mobile/id458066754'],
+        ['MeDirect', 'MeDirect-app', 'https://apps.apple.com/be/app/medirect/id1444845440']
+      ]], ['pensioen','Pensioen'], ['belastingen','Belastingen'],
       ['hospitalisatie','Hospitalisatieverzekering'], ['levensverzekering','Levensverzekering'] ]},
     { key:'abonnementen', label:'Abonnementen', items:[
       ['energie','Energie'], ['telecom','Internet, tv en gsm'], ['water','Water'] ]},
@@ -479,7 +483,7 @@
 
   // ---- Categorieën ----
   function itemsVan(cat){
-    return cat.items.map(([key,label])=>({key,label,extra:false}))
+    return cat.items.map(([key,label,links])=>({key,label,links:links||[],extra:false}))
       .concat((staat.extra[cat.key]||[]).map(x=>({...x, extra:true})));
   }
 
@@ -496,6 +500,12 @@
       }
       if(d.notitie) inhoud += `<p class="notitie">${esc(d.notitie)}</p>`;
       if(!ingevuld) inhoud = `<p class="leeg">Nog niets ingevuld.</p>`;
+      if(it.links && it.links.length){
+        inhoud += `<div style="margin-top:10px;">` + it.links.map(([naam,app,url])=>`
+          <a class="link-btn" href="${url}" target="_blank" rel="noopener">
+            <strong>${esc(naam)}</strong><span>${esc(app)}. Tik daarna op Open.</span>
+          </a>`).join('') + `</div>`;
+      }
       return `
         <div class="doc-card">
           <div class="doc-top">

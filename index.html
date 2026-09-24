@@ -87,6 +87,11 @@
   .link-btn span{font-size:13px; color:var(--muted);}
   .klein-link{display:block; margin:18px auto 0; background:none; border:none; color:#9AA3B1; font-size:12.5px; text-decoration:underline; font-family:'Inter',sans-serif;}
 
+  .bestanden{display:flex; flex-direction:column; gap:6px; margin-top:6px;}
+  .bestand-btn{display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:#fff; border:1px solid var(--paper-line); border-radius:7px; padding:10px 12px; font-family:'Inter',sans-serif; font-size:15px; color:var(--ink);}
+  .b-icoon{font-size:11px; font-weight:700; color:#fff; background:var(--bg); border-radius:4px; padding:3px 6px; flex:0 0 auto;}
+  .bestand-rij{display:flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--paper-line); border-radius:7px; padding:8px 10px; margin-bottom:6px;}
+  .bestand-rij .b-naam{flex:1; font-size:14.5px;}
   /* Viewer */
   .police-modal{position:fixed; inset:0; background:#000; display:none; z-index:100; flex-direction:column;}
   .police-modal.active{display:flex;}
@@ -495,12 +500,23 @@
       .concat((staat.extra[cat.key]||[]).map(x=>({...x, extra:true})));
   }
 
+  function bestandenVan(d){
+    if(Array.isArray(d.bestanden)) return d.bestanden;
+    if(d.fotoUrl) return [{ url:d.fotoUrl, type:d.bestandType, naam:'Document' }];
+    return [];
+  }
+  function labelVan(key){
+    for(const c of CATS){ const it = itemsVan(c).find(x=>x.key===key); if(it) return it.label; }
+    return 'Document';
+  }
+
   function renderCat(cat){
     const el = document.getElementById('lijst-'+cat.key);
     if(!el) return;
     el.innerHTML = itemsVan(cat).map(it=>{
       const d = staat.items[it.key] || {};
-      const ingevuld = d.waar || d.contact || d.telefoon || d.notitie || d.fotoUrl;
+      const bestanden = bestandenVan(d);
+      const ingevuld = d.waar || d.contact || d.telefoon || d.notitie || bestanden.length;
       let inhoud = '';
       if(d.waar) inhoud += `<p class="info"><span class="lbl">Waar ligt het</span>${esc(d.waar)}</p>`;
       if(d.contact || d.telefoon){
@@ -508,6 +524,13 @@
       }
       if(d.notitie) inhoud += `<p class="notitie">${esc(d.notitie)}</p>`;
       if(!ingevuld) inhoud = `<p class="leeg">Nog niets ingevuld.</p>`;
+      if(bestanden.length){
+        inhoud += `<div class="bestanden">` + bestanden.map((b,i)=>`
+          <button class="bestand-btn" onclick="toonItem('${it.key}',${i})">
+            <span class="b-icoon">${b.type === 'application/pdf' ? 'PDF' : 'Foto'}</span>
+            <span class="b-naam">${esc(b.naam)}</span>
+          </button>`).join('') + `</div>`;
+      }
       if(it.links && it.links.length){
         inhoud += `<div style="margin-top:10px;">` + it.links.map(([naam,app,url])=>`
           <a class="link-btn" href="${url}" target="_blank" rel="noopener">
@@ -522,8 +545,7 @@
           </div>
           ${inhoud}
           <div class="doc-actions">
-            ${d.fotoUrl ? `<button class="btn police" onclick="toonItem('${it.key}','${esc(it.label)}')">Bekijk document</button>` : ''}
-            <button class="btn ${d.fotoUrl ? '' : 'grow'}" onclick="bewerkItem('${cat.key}','${it.key}')">Bewerk</button>
+            <button class="btn grow" onclick="bewerkItem('${cat.key}','${it.key}')">Bewerk</button>
           </div>
         </div>`;
     }).join('');
@@ -555,12 +577,13 @@
       <div class="veld"><label for="f-notitie">Wat moet je weten</label>
         <textarea id="f-notitie">${esc(d.notitie)}</textarea></div>
 
+      <div class="veld"><label>Documenten</label><div id="sheet-bestanden"></div></div>
       <label class="btn" style="width:100%;">
-        ${d.fotoUrl ? 'Vervang foto of PDF' : '+ Foto of PDF toevoegen'}
-        <input type="file" accept="image/*,application/pdf" onchange="uploadItem('${catKey}','${key}', this.files[0])">
+        + Document toevoegen
+        <input type="file" accept="image/*,application/pdf" multiple onchange="uploadItem('${key}', this.files); this.value='';">
       </label>
-      <p class="hint">Gevoelige stukken zoals de zorgvolmacht of ID bewaar je beter in Izimi. Schrijf dan bij "Waar ligt het" gewoon "In Izimi".</p>
       <p class="hint" id="upload-status"></p>
+      <p class="hint">Gevoelige stukken zoals de zorgvolmacht of ID bewaar je beter in Izimi. Schrijf dan bij "Waar ligt het" gewoon "In Izimi".</p>
 
       <div class="sheet-acties">
         <button class="btn grow" onclick="sluitSheet()">Annuleer</button>
@@ -568,17 +591,36 @@
       </div>
       ${it.extra ? `<div class="sheet-acties"><button class="btn danger grow" onclick="verwijderItem('${catKey}','${key}')">Verwijder dit onderdeel</button></div>` : ''}
     `);
+    tekenSheetBestanden(key);
+  }
+
+  function tekenSheetBestanden(key){
+    const el = document.getElementById('sheet-bestanden');
+    if(!el) return;
+    const bestanden = bestandenVan(staat.items[key] || {});
+    el.innerHTML = bestanden.length
+      ? bestanden.map((b,i)=>`
+          <div class="bestand-rij">
+            <span class="b-naam">${esc(b.naam)}</span>
+            <button class="pencil" onclick="hernoemBestand('${key}',${i})">Hernoem</button>
+            <button class="pencil" style="color:var(--danger);" onclick="verwijderBestand('${key}',${i})">Verwijder</button>
+          </div>`).join('')
+      : `<p class="leeg">Nog geen documenten.</p>`;
+  }
+
+  function veldenUitSheet(vorig){
+    const v = id => document.getElementById(id);
+    return {
+      waar: v('f-waar') ? v('f-waar').value.trim() : (vorig.waar||''),
+      contact: v('f-contact') ? v('f-contact').value.trim() : (vorig.contact||''),
+      telefoon: v('f-tel') ? v('f-tel').value.trim() : (vorig.telefoon||''),
+      notitie: v('f-notitie') ? v('f-notitie').value.trim() : (vorig.notitie||'')
+    };
   }
 
   function bewaarItem(key){
     const vorig = staat.items[key] || {};
-    staat.items[key] = {
-      ...vorig,
-      waar: document.getElementById('f-waar').value.trim(),
-      contact: document.getElementById('f-contact').value.trim(),
-      telefoon: document.getElementById('f-tel').value.trim(),
-      notitie: document.getElementById('f-notitie').value.trim()
-    };
+    staat.items[key] = { ...vorig, ...veldenUitSheet(vorig), bestanden: bestandenVan(vorig) };
     opslaan(); sluitSheet();
   }
 
@@ -589,33 +631,55 @@
     opslaan(); sluitSheet();
   }
 
-  async function uploadItem(catKey, key, file){
-    if(!file) return;
+  async function uploadItem(key, files){
+    if(!files || !files.length) return;
+    const lijst = [...files];
     const status = document.getElementById('upload-status');
-    if(status) status.textContent = 'Bezig met opladen...';
-    try{
-      const url = await laadOp(`documenten/${key}`, file);
-      const vorig = staat.items[key] || {};
-      staat.items[key] = {
-        ...vorig,
-        waar: document.getElementById('f-waar')?.value.trim() ?? vorig.waar,
-        contact: document.getElementById('f-contact')?.value.trim() ?? vorig.contact,
-        telefoon: document.getElementById('f-tel')?.value.trim() ?? vorig.telefoon,
-        notitie: document.getElementById('f-notitie')?.value.trim() ?? vorig.notitie,
-        fotoUrl: url, bestandType: file.type, bijgewerkt: new Date().toISOString()
-      };
-      opslaan();
-      if(status) status.textContent = 'Opgeladen.';
-    } catch(err){
-      console.error(err);
-      if(status) status.textContent = 'Opladen mislukt: ' + (err.code || err.message || err);
+    for(let n = 0; n < lijst.length; n++){
+      const file = lijst[n];
+      const standaard = file.name.replace(/\.[^.]+$/, '');
+      const naam = (prompt('Naam voor dit document (bv. Aanvraag, Verzekering, Tak 21):', standaard) || standaard).trim();
+      if(status) status.textContent = `Bezig met opladen (${n+1} van ${lijst.length})...`;
+      try{
+        const url = await laadOp(`documenten/${key}`, file);
+        const vorig = staat.items[key] || {};
+        const bestanden = bestandenVan(vorig).concat([{ url, type:file.type, naam, datum:new Date().toISOString() }]);
+        staat.items[key] = { ...vorig, ...veldenUitSheet(vorig), bestanden };
+        opslaan();
+        tekenSheetBestanden(key);
+      } catch(err){
+        console.error(err);
+        if(status) status.textContent = 'Opladen mislukt: ' + (err.code || err.message || err);
+        return;
+      }
     }
+    if(status) status.textContent = 'Opgeladen.';
   }
 
-  function toonItem(key, label){
+  function hernoemBestand(key, i){
+    const vorig = staat.items[key] || {};
+    const bestanden = bestandenVan(vorig).map(b=>({...b}));
+    const nieuw = prompt('Nieuwe naam:', bestanden[i].naam);
+    if(!nieuw || !nieuw.trim()) return;
+    bestanden[i].naam = nieuw.trim();
+    staat.items[key] = { ...vorig, ...veldenUitSheet(vorig), bestanden };
+    opslaan(); tekenSheetBestanden(key);
+  }
+
+  function verwijderBestand(key, i){
+    const vorig = staat.items[key] || {};
+    const bestanden = bestandenVan(vorig).slice();
+    if(!confirm(`"${bestanden[i].naam}" verwijderen?`)) return;
+    bestanden.splice(i,1);
+    staat.items[key] = { ...vorig, ...veldenUitSheet(vorig), bestanden, fotoUrl:null, bestandType:null };
+    opslaan(); tekenSheetBestanden(key);
+  }
+
+  function toonItem(key, i){
     const d = staat.items[key] || {};
-    if(!d.fotoUrl) return;
-    toonBestand(d.fotoUrl, d.bestandType, label, d.waar ? 'Origineel: ' + d.waar : '');
+    const b = bestandenVan(d)[i];
+    if(!b) return;
+    toonBestand(b.url, b.type, `${labelVan(key)}: ${b.naam}`, d.waar ? 'Origineel: ' + d.waar : '');
   }
 
   // ---- Bewerkvenster ----

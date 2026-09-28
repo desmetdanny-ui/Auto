@@ -301,7 +301,9 @@
       ]], ['belastingen','Belastingen'],
       ['hospitalisatie','Hospitalisatieverzekering'], ['levensverzekering','Levensverzekering'] ]},
     { key:'abonnementen', label:'Abonnementen', items:[
-      ['energie','Energie'], ['telecom','Internet, tv en gsm'], ['water','Water'] ]},
+      ['energie','Energie'], ['telecom','Internet, tv en gsm', [
+        ['Proximus+', 'Facturen, verbruik en abonnement', 'https://apps.apple.com/be/app/proximus-telecom-and-more/id483589694']
+      ]], ['water','Water'] ]},
     { key:'wensen', label:'Wensen', items:[
       ['uitvaart','Uitvaartwensen'], ['belangrijk','Wat ik belangrijk vind'] ]}
   ];
@@ -534,10 +536,11 @@
             <span class="b-naam">${esc(b.naam)}</span>
           </button>`).join('') + `</div>`;
       }
-      if(it.links && it.links.length){
-        inhoud += `<div style="margin-top:10px;">` + it.links.map(([naam,app,url])=>`
-          <a class="link-btn" href="${url}" target="_blank" rel="noopener">
-            <strong>${esc(naam)}</strong><span>${esc(app)}${url.includes('apps.apple.com') ? '. Tik daarna op Open.' : ''}</span>
+      const alleLinks = (it.links||[]).concat((d.links||[]).map(l=>[l.naam, '', l.url]));
+      if(alleLinks.length){
+        inhoud += `<div style="margin-top:10px;">` + alleLinks.map(([naam,app,url])=>`
+          <a class="link-btn" href="${esc(url)}" target="_blank" rel="noopener">
+            <strong>${esc(naam)}</strong><span>${esc(app)}${url.includes('apps.apple.com') ? (app ? '. ' : '') + 'Tik daarna op Open.' : ''}</span>
           </a>`).join('') + `</div>`;
       }
       return `
@@ -580,6 +583,10 @@
       <div class="veld"><label for="f-notitie">Wat moet je weten</label>
         <textarea id="f-notitie">${esc(d.notitie)}</textarea></div>
 
+      <div class="veld"><label>Links naar apps of websites</label><div id="sheet-links"></div>
+        <button class="btn" style="width:100%;" onclick="linkKlad.push({naam:'',url:''}); tekenSheetLinks()">+ Link toevoegen</button>
+        <p class="hint">Voor een app: open de app in de App Store, tik op het deelicoon, kies Kopieer link en plak die hier.</p></div>
+
       <div class="veld"><label>Documenten</label><div id="sheet-bestanden"></div></div>
       <label class="btn" style="width:100%;">
         + Document toevoegen
@@ -594,7 +601,28 @@
       </div>
       ${it.extra ? `<div class="sheet-acties"><button class="btn danger grow" onclick="verwijderItem('${catKey}','${key}')">Verwijder dit onderdeel</button></div>` : ''}
     `);
+    linkKlad = (d.links||[]).map(l=>({...l}));
+    tekenSheetLinks();
     tekenSheetBestanden(key);
+  }
+
+  let linkKlad = [];
+  function tekenSheetLinks(){
+    const el = document.getElementById('sheet-links');
+    if(!el) return;
+    el.innerHTML = linkKlad.map((l,i)=>`
+      <div class="contact-edit">
+        <input placeholder="Naam (bv. Proximus)" value="${esc(l.naam)}" oninput="linkKlad[${i}].naam=this.value">
+        <input placeholder="Link (https://...)" type="url" value="${esc(l.url)}" oninput="linkKlad[${i}].url=this.value">
+        <button class="btn danger" onclick="linkKlad.splice(${i},1); tekenSheetLinks()">Verwijder</button>
+      </div>`).join('');
+  }
+  function schoneLinks(){
+    return linkKlad.map(l=>{
+      let url = (l.url||'').trim();
+      if(url && !/^https?:\/\//i.test(url)) url = 'https://' + url;
+      return { naam:(l.naam||'').trim() || url, url };
+    }).filter(l=>l.url);
   }
 
   function tekenSheetBestanden(key){
@@ -623,7 +651,7 @@
 
   function bewaarItem(key){
     const vorig = staat.items[key] || {};
-    staat.items[key] = { ...vorig, ...veldenUitSheet(vorig), bestanden: bestandenVan(vorig) };
+    staat.items[key] = { ...vorig, ...veldenUitSheet(vorig), bestanden: bestandenVan(vorig), links: schoneLinks() };
     opslaan(); sluitSheet();
   }
 
